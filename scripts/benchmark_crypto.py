@@ -2,12 +2,17 @@ from __future__ import annotations
 import argparse 
 import csv 
 import os 
+import sys
+import platform
 import pathlib 
 import statistics as st 
 import time 
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 from controller import crypto_agility as ca 
 from controller .security_engine import BACKEND 
-RESULTS =pathlib .Path ('results')
+RESULTS = pathlib.Path("results")
 BANDWIDTHS =(1.0 ,8.0 ,50.0 )
 
 def bench_handshake (suite :ca .Suite ,n :int )->list [float ]:
@@ -36,7 +41,22 @@ def main (n :int ):
         w .writeheader ()
         w .writerows (rows )
     bw_cols =[f'tx_ms_{b :g}mbps'for b in BANDWIDTHS ]
-    lines =['# Crypto-Agility Benchmark','','> **Emulated testbed.** Handshake / AEAD timings are wall-clock on the','> machine that ran the script (Python). Transmit times are bandwidth-only','> estimates (bytes*8/bw), not measured network RTT.','',f'**Backend:** {BACKEND } | **Repetitions:** {n }','','| Suite | Key exchange | AEAD | Handshake bytes | Handshake mean (ms) | SD | p95 | AEAD MB/s (1 KiB) | '+' | '.join ((f'tx @{b :g} Mbps (ms)'for b in BANDWIDTHS ))+' | Real? |','|'+'---|'*(8 +len (BANDWIDTHS )+1 )]
+    lines = [
+        '# Crypto-Agility Benchmark',
+        '',
+        '> **Measurement Environment:**',
+        f'> - **Platform:** {platform.platform()} ({platform.machine()})',
+        f'> - **Python:** {platform.python_version()}',
+        f'> - **Crypto Backend:** {BACKEND}',
+        f'> - **liboqs Active:** {ca.HAS_MLKEM}',
+        f'> - **Repetitions:** {n}',
+        '',
+        '> **Note:** Handshake / AEAD timings are wall-clock on the machine that ran the script (Python/OpenSSL).',
+        '> Transmit times are bandwidth-only estimates (bytes*8/bw), not measured network RTT.',
+        '',
+        '| Suite | Key exchange | AEAD | Handshake bytes | Handshake mean (ms) | SD | p95 | AEAD MB/s (1 KiB) | ' + ' | '.join((f'tx @{b:g} Mbps (ms)' for b in BANDWIDTHS)) + ' | Real? |',
+        '|' + '---|' * (8 + len(BANDWIDTHS) + 1)
+    ]
     for r in rows :
         lines .append (f"| {r ['suite']} | {r ['kex']} | {r ['aead']} | {r ['handshake_bytes']} | {r ['hs_mean_ms']} | {r ['hs_sd_ms']} | {r ['hs_p95_ms']} | {r ['aead_MBps']} | "+' | '.join ((str (r [c ])for c in bw_cols ))+f" | {('yes'if r ['real']else 'MOCK ML-KEM')} |")
     lines +=['','## Policy','','- Threat -> hybrid (X25519 + ML-KEM-768).',f'- No threat -> ML-KEM-768 alone.',f'- AEAD: ChaCha20-Poly1305 below {ca .AEAD_AES_MIN_MBPS :g} Mbps, AES-256-GCM at or above.',f'- X25519-only below {ca .CLASSICAL_MAX_MBPS :g} Mbps only if `allow_classical=True` (not PQ-safe).','']

@@ -230,12 +230,15 @@ class AICOPPolicyCoordinator:
         self.gnb_states = {}  # {cell_id: 'ON' | 'SLEEP'}
         self.flapping_history = {}
 
-    def arbitrate_cell(self, cell_id: str, load: float, sinr: float, trust: float) -> Dict[str, any]:
+    def arbitrate_cell(self, cell_id: str, load: float, sinr: float, trust: float, true_load: Optional[float] = None) -> Dict[str, any]:
         """
         Arbitrates conflicting policies for an edge gNB.
         Returns coordinated action and SLA safety margin.
         """
-        # 1. Individual xApp Proposals
+        if true_load is None:
+            true_load = load
+
+        # 1. Individual xApp Proposals (evaluated on reported telemetry)
         # TS xApp wants to steer traffic away if load is high
         ts_delta = max(-0.3, min(0.3, (0.50 - load) * 0.6))
         
@@ -258,15 +261,22 @@ class AICOPPolicyCoordinator:
         effective_ts = ts_delta * trust
         effective_es = es_delta * (trust ** 2)  # Quadratic penalty on power down under suspicious data
         
-        # Determine cell power state
+        # Determine cell power state under AICOP trust arbitration
         if effective_es < -0.3 and trust >= 0.70:
             new_state = "SLEEP"
         else:
             new_state = "ON"
         self.gnb_states[cell_id] = new_state
 
-        # Compute SLA violation risk
-        sla_violation_risk = max(0.0, (load + (0.3 if new_state == "SLEEP" else 0.0)) - 0.85)
+        # Compute physical SLA violation risk on true load
+        # Capacity limit threshold is 0.85
+        managed_stress = true_load + (0.30 if new_state == "SLEEP" else 0.0)
+        sla_violation_risk = max(0.0, (managed_stress - 0.85) / 0.85)
+
+        # Counterfactual: Unmanaged naive coordination (no trust veto)
+        unmanaged_state = "SLEEP" if load < self.sleep_load_thresh else "ON"
+        unmanaged_stress = true_load + (0.30 if unmanaged_state == "SLEEP" else 0.0)
+        unmanaged_sla_risk = max(0.0, (unmanaged_stress - 0.85) / 0.85)
 
         return {
             "cell_id": cell_id,
@@ -276,6 +286,7 @@ class AICOPPolicyCoordinator:
             "qos_boost": round(qos_delta, 3),
             "trust": trust,
             "sla_risk": round(sla_violation_risk, 3),
+            "unmanaged_sla_risk": round(unmanaged_sla_risk, 3),
             "is_corrupted": (trust < 0.40)
         }
 
@@ -326,14 +337,23 @@ class UnifiedAICOPBridge:
         decisions = {}
         corrupted_count = 0
         total_sla_risk = 0.0
+        total_unmanaged_sla_risk = 0.0
 
         for cid, feats in telemetry_batch.items():
             t_score = trust_scores.get(cid, 0.95)
-            dec = self.coordinator.arbitrate_cell(cid, load=feats[0], sinr=feats[1], trust=t_score)
+            true_load = feats[2] if len(feats) > 2 else feats[0]
+            dec = self.coordinator.arbitrate_cell(
+                cid,
+                load=feats[0],
+                sinr=feats[1],
+                trust=t_score,
+                true_load=true_load,
+            )
             decisions[cid] = dec
             if dec["is_corrupted"]:
                 corrupted_count += 1
             total_sla_risk += dec["sla_risk"]
+            total_unmanaged_sla_risk += dec["unmanaged_sla_risk"]
 
         # 3. Compute cross-layer degradation score
         # Higher score means terrestrial RAN is severely corrupted / overloaded

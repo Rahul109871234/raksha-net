@@ -51,6 +51,43 @@ class HeuristicDetector :
         self ._smoothed [link_id ]=smoothed 
         return round (min (1.0 ,smoothed ),3 )
 
+class CUSUMDetector:
+    """
+    Page's Cumulative Sum (CUSUM) sequential change-point detector (Moustakides 1986).
+    Computes: S_t = max(0, S_{t-1} + (z_t - k)), with drift k=0.50, threshold h=2.0.
+    Supports proactive cross-layer pre-arming (priming S_0 = 1.0 on terrestrial FDI intent).
+    """
+    LABEL = 'CUSUMDetector'
+
+    def __init__(self, drift_k: float = 0.50, threshold_h: float = 2.0):
+        self.k = drift_k
+        self.h = threshold_h
+        self.S: Dict[str, float] = {}
+        self.is_pre_armed: Dict[str, bool] = {}
+
+    def pre_arm(self, link_id: str, primed_s0: float = 1.0):
+        """Prime CUSUM state S_0 = 1.0 upon terrestrial cross-layer alert."""
+        self.S[link_id] = max(self.S.get(link_id, 0.0), primed_s0)
+        self.is_pre_armed[link_id] = True
+
+    def reset_pre_arm(self, link_id: str):
+        self.is_pre_armed[link_id] = False
+
+    def score(self, hist: List[LinkTelemetry]) -> float:
+        if not hist:
+            return 0.0
+        t = hist[-1]
+        lid = t.link_id
+        raw = _raw_score(t.latency_ms, t.loss, t.queue_depth)
+        
+        # Sequential CUSUM accumulation
+        prev_s = self.S.get(lid, 0.0)
+        curr_s = max(0.0, prev_s + (raw * 2.5 - self.k))
+        self.S[lid] = curr_s
+        
+        # Normalized anomaly score [0.0, 1.0]
+        return round(min(1.0, curr_s / self.h), 3)
+
 class AICOPDetector :
 
     def __init__ (self ):

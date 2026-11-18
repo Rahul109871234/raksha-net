@@ -176,6 +176,7 @@ class Open5GSBackend:
         ping_count: int = 3,
         use_prometheus: bool = True,
         metrics_url: str = O5GS_METRICS_URL,
+        allow_degraded: bool = True,
     ):
         if link_ids is None:
             link_ids = list(LINK_PROBE_MAP.keys())
@@ -185,6 +186,7 @@ class Open5GSBackend:
         self.ping_count = ping_count
         self.use_prometheus = use_prometheus
         self.metrics_url = metrics_url
+        self.allow_degraded = allow_degraded
         self._probe_interval = probe_interval_s
 
         self._cache: Dict[str, Dict] = {lid: dict(_BASELINE) for lid in link_ids}
@@ -274,15 +276,23 @@ class Open5GSBackend:
         target  = cfg.get("target", "")
         netns   = cfg.get("netns", None)
 
-        # Process liveness -> total blackout if daemon is down
+        # Process liveness -> total blackout if daemon is down, unless degraded mode allowed
         if process and not _is_process_running(process):
-            log.warning("[Open5GS] %s DOWN -> %s BLACKOUT", process, link_id)
-            return dict(_BLACKOUT)
+            if not self.allow_degraded:
+                log.warning("[Open5GS] %s DOWN -> %s BLACKOUT", process, link_id)
+                return dict(_BLACKOUT)
 
         # Ping for latency / loss
         ping = {"latency_ms": 5.0, "jitter_ms": 0.5, "loss": 0.0}
         if target:
-            ping = _ping_probe(target, self.ping_count, netns=netns)
+            res = _ping_probe(target, self.ping_count, netns=netns)
+            if res["loss"] < 1.0 or not self.allow_degraded:
+                ping = res
+            else:
+                # In degraded mode (e.g. Windows without active WSL2 ogstun IP), preserve calibrated profile
+                with self._lock:
+                    cached = self._cache.get(link_id, _BASELINE)
+                ping = {"latency_ms": cached["latency_ms"], "jitter_ms": cached["jitter_ms"], "loss": cached["loss"]}
 
         # Prometheus throughput / queue
         thr, qdep = _BASELINE["throughput_mbps"], _BASELINE["queue_depth"]

@@ -1,6 +1,6 @@
 # AICOP-RAKSHA: Unified Autonomous Resilience & Policy Coordination Framework for 5G/6G Terrestrial & Non-Terrestrial Networks
 
-**Authors:** G Rahul Reddy (`24BEC038`), Rajarwar Deependra Sahebrao (`22BCS220`)  
+**Lead Researcher:** G Rahul Reddy (`24BEC038`)  
 **Faculty Mentor:** Dr. Satish Kumar Tiwari, Department of Electronics & Communication Engineering, PDPM IIITDM Jabalpur  
 **Domain:** O-RAN Near-RT RIC | 5G Non-Terrestrial Networks (NTN) | Graph Neural Networks | Post-Quantum Cryptography  
 

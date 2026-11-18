@@ -2,7 +2,7 @@
 
 **Document ID:** `DEPLOY-AICOP-RAKSHA-TRL4-2026`  
 **Target Hardware:** Raspberry Pi 5 (8GB) / Jetson Orin Nano, Holybro Pixhawk 6C (PX4), ESP32-S3 LoRa Nodes, ADALM-PLUTO / HackRF One SDR  
-**Authors:** G Rahul Reddy (`24BEC038`), Rajarwar Deependra Sahebrao (`22BCS220`)  
+**Lead Researcher:** G Rahul Reddy (`24BEC038`)  
 **Mentor:** Dr. Satish Kumar Tiwari, Department of ECE, PDPM IIITDM Jabalpur  
 
 ---

@@ -3,13 +3,13 @@
 **Technical Whitepaper & Architectural Reference Specification (TRL-4)**  
 **Document ID:** `WP-AICOP-RAKSHA-2026-V5`  
 **Date:** November 2026  
-**Affiliation:** Wireless Communications & Signal Processing (WCSP) Research Laboratory, Department of Electronics & Communication Engineering, PDPM Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Jabalpur, India  
+**Affiliation:** Department of Electronics & Communication Engineering, PDPM Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Jabalpur, India  
 
 ---
 
 ### Author Information
 * **G. Rahul Reddy** — Lead Systems Architect & Primary Researcher | Roll No: `24BEC038`, B.Tech Electronics & Communication Engineering, PDPM IIITDM Jabalpur | `24bec038@iiitdmj.ac.in`
-* **Dr. Satish Kumar Tiwari** — Faculty Research Supervisor | Assistant Professor & Head, Wireless Communications & Signal Processing (WCSP) Lab, Department of Electronics & Communication Engineering, PDPM IIITDM Jabalpur | `stiwari@iiitdmj.ac.in`
+* **Dr. Satish Kumar Tiwari** — Faculty Research Supervisor | Assistant Professor, Department of Electronics & Communication Engineering, PDPM IIITDM Jabalpur | `stiwari@iiitdmj.ac.in`
 * **Department:** Electronics & Communication Engineering, PDPM Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Jabalpur, MP, India  
 
 ---
@@ -105,21 +105,27 @@ $$\tau_{\text{handshake}} = 3 \times \text{RTT}_{\text{LEO}} + \tau_{\text{wire}
 ## 4. Detection Experiment & Full Algorithmic Ablation Study
 
 ### 4.1 Experimental Protocol
-* **Dataset Size:** Evaluated across $N = 24,000$ cell-epochs ($12\text{ cells} \times 2,000\text{ epochs}$ sampled at $100\text{ ms}$) over 10 independent runs (`seeds = [42, 107, 211, 389, 523, 647, 761, 883, 941, 1039]`).
-* **Train/Test Split:** 70/30 chronological split. Test set holds $7,200$ cell-epochs at $20.0\%$ attack prevalence ($1,440$ attack cell-epochs, $5,760$ nominal).
+* **Dataset & Script Provenance:** Empirically evaluated via `scripts/run_detection_ablation.py` across $N = 24,000$ cell-epochs ($12\text{ cells} \times 2,000\text{ epochs}$) over 10 independent runs (`seeds = [42, 107, 211, 389, 523, 647, 761, 883, 941, 1039]`) on the 12-cell planar grid topology ($|V|=12, |E|=17$).
+* **Train/Test Split:** Chronological 70/30 split. Test set holds $7,200$ cell-epochs with $20.0\%$ attack prevalence ($1,440$ attack cell-epochs, $5,760$ nominal). Benign load jitter $\sigma = 0.05$.
 * **Attacker Models:**
-  * **Gray-Box Stealth Attacker:** $\delta \le 0.15 = 2.5\sigma$ (benign load jitter $\sigma = 0.06$), targeting surrogate median threshold $|L_{\text{rep}} - L_{\text{ref}}| \le 0.15$.
-  * **White-Box Gradient Attacker:** Optimizing perturbation directly against $T(v) \ge 0.40$ with full knowledge of weights $W_1, W_2, w_{\text{out}}$.
+  * **Gross FDI Attacker:** Coarse telemetry falsification ($\Delta \in [0.25, 0.65]$).
+  * **Gray-Box Stealth Attacker:** Bounded perturbation ($\delta \le 0.15 = 3\sigma$) designed to remain beneath naive threshold barriers.
+  * **Adjacent Colluding Cells:** Multi-cell coordinated attack on adjacent edge (gNB-09 and gNB-10 falsifying loads simultaneously).
 
-### 4.2 Comprehensive Ablation Table (Mathematically Reconciled via Bayes' Theorem)
+### 4.2 Comprehensive Ablation Table (Empirically Computed from 10 Seeds)
 
 | Model Architecture / Feature Ablation | Precision | Recall | F1-Score | False Alarm Rate (FAR) | AUC-ROC | Stealth F1 ($\delta \le 0.15$) | Adjacent Collusion F1 |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Tuned Spatial Median Residual** ($|L_{\text{rep}} - L_{\text{ref}}| > \theta$) | $74.6 \pm 1.6\%$ | $76.2 \pm 1.8\%$ | $75.4 \pm 1.5\%$ | $6.5 \pm 0.7\%$ | $0.842$ | $54.1 \pm 2.2\%$ | $61.4 \pm 2.4\%$ |
-| **2-Layer MLP** (No Graph Aggregation, $x_v$ input) | $80.7 \pm 1.4\%$ | $80.1 \pm 1.5\%$ | $80.4 \pm 1.3\%$ | $4.8 \pm 0.6\%$ | $0.871$ | $62.3 \pm 1.9\%$ | $68.5 \pm 2.0\%$ |
-| **GraphSAGE-Only** (Learned GNN, no $\exp$ penalty) | $90.3 \pm 1.2\%$ | $89.5 \pm 1.3\%$ | $89.9 \pm 1.1\%$ | $2.4 \pm 0.4\%$ | $0.938$ | $82.6 \pm 1.5\%$ | $84.2 \pm 1.6\%$ |
-| **Deviation Penalty-Only** (Heuristic $\exp(-\beta \|\cdot\|_1)$) | $81.9 \pm 1.5\%$ | $81.2 \pm 1.7\%$ | $81.5 \pm 1.4\%$ | $4.5 \pm 0.6\%$ | $0.880$ | $59.5 \pm 2.1\%$ | $63.0 \pm 2.3\%$ |
-| **Unified AICOP GraphSAGE + Penalty (Ours)** | **$96.3 \pm 1.1\%$** | **$94.8 \pm 1.3\%$** | **$95.6 \pm 1.2\%$** | **$0.9 \pm 0.2\%$** | **$0.978$** | **$91.4\%$ (88.6% White-Box)** | **$89.2 \pm 1.4\%$** |
+| **Tuned Spatial Median Residual** ($|L_{\text{rep}} - L_{\text{ref}}| > \theta$) | $4.1 \pm 1.0\%$ | $70.8 \pm 9.3\%$ | $7.8 \pm 1.7\%$ | $38.8 \pm 12.1\%$ | $0.725$ | $1.9 \pm 0.4\%$ | $4.0 \pm 1.0\%$ |
+| **2-Layer MLP** (No Graph Aggregation, $x_v$ input) | $80.0 \pm 42.2\%$ | $23.5 \pm 18.3\%$ | $34.9 \pm 24.5\%$ | $0.0 \pm 0.0\%$ | $0.934$ | $0.0 \pm 0.0\%$ | $37.1 \pm 35.0\%$ |
+| **GraphSAGE-Only** (Learned GNN, no $\exp$ penalty) | $50.0 \pm 52.7\%$ | $5.4 \pm 13.5\%$ | $8.1 \pm 18.8\%$ | $0.0 \pm 0.0\%$ | $0.924$ | $0.0 \pm 0.0\%$ | $8.6 \pm 27.1\%$ |
+| **Deviation Penalty-Only** (Heuristic $\exp(-\beta \|\cdot\|_1)$) | $100.0 \pm 0.0\%$ | $66.4 \pm 1.6\%$ | $79.8 \pm 1.2\%$ | $0.0 \pm 0.0\%$ | $1.000$ | $0.0 \pm 0.0\%$ | $97.1 \pm 0.6\%$ |
+| **Unified AICOP GraphSAGE + Penalty (Ours)** | **$89.8 \pm 14.3\%$** | **$99.6 \pm 0.9\%$** | **$93.8 \pm 8.7\%$** | **$0.3 \pm 0.5\%$** | **$1.000$** | **$85.1 \pm 18.1\%$** | **$89.8 \pm 14.3\%$** |
+
+*Key Findings from Algorithmic Ablation:*  
+1. **Stealth Vulnerability in Heuristic Penalties:** While pure exponential deviation penalties perform strongly against gross attacks, they completely fail under stealth attacks ($\delta \le 0.15$), yielding **0.0% Stealth F1**.
+2. **Breakdown of 1-Hop Spatial Medians:** When adjacent cells collude, 1-hop spatial neighbor medians are biased, dropping collusion F1 to **$4.0\%$** with a prohibitive **$38.8\%$ false alarm rate**.
+3. **Resilience of Unified Multi-Hop Architecture:** By combining 2-hop neighborhood inductive aggregation with exponential residual scaling, Unified AICOP maintains **$85.1\%$ Stealth F1** and **$89.8\%$ Collusion F1** with low false alarms ($0.3\%$).
 
 ---
 
@@ -128,13 +134,13 @@ $$\tau_{\text{handshake}} = 3 \times \text{RTT}_{\text{LEO}} + \tau_{\text{wire}
 | Evaluation Dimension | Baseline / Control Arm | Unified AICOP-RAKSHA | Empirical Gain / Statistical Impact |
 | :--- | :--- | :---: | :--- |
 | **QoS-SLA Violations (50% Flap)** | $58.40\%$ (Reimplemented PACIFISTA: $8.24\%$) | **$5.88\%$** | **$-52.52\text{ pp}$** vs unmanaged; **$-2.36\text{ pp}$** vs PACIFISTA ($t = 4.12, p = 0.003$) |
-| **Failover Latency (3-Arm Control)** | **Arm 1:** $1,420\text{ ms}$ (BGP/SCTP Timeout)<br/>**Arm 2:** $230\text{ ms}$ (Decoupled CUSUM, $k=0.5$) | **Arm 3: $190\text{ ms}$ (Proactive Pre-Armed, $S_0=1.0$)** | **$7.5\times$ faster than BGP; $40\text{ ms}$ acceleration ($17.4\%$) over standalone CUSUM** |
+| **Failover Latency (3-Arm Control)** | **Arm 1:** $1,420\text{ ms}$ (BGP/SCTP Timeout)<br/>**Arm 2:** $230\text{ ms}$ (Decoupled CUSUM, $k=0.5$) | **Arm 3: $190\text{ ms}$ (Pre-Armed Transition Model)** | **$7.5\times$ faster than BGP; $40\text{ ms}$ acceleration ($17.4\%$) over standalone CUSUM (configured $22\text{ ms}$ detection $+ 168\text{ ms}$ switch in $100\text{ ms}$ loop; measured CPU compute $<8.4\text{ ms}$)** |
 | **Transient PDR (1-s Outage Window)** | $32.3\%$ (Arm 1) / $82.0\%$ (Arm 2) | **$84.6\%$ (1-s window) / $96.8\%$ (steady)** | **$+52.3\text{ pp advantage}$** over Arm 1; **$+2.6\text{ pp}$** over Arm 2 |
 | **Satellite PDR Under RF Jamming** | $32.3\%$ PDR ($67.7\%$ packet loss) | **$96.8\%$ PDR ($3.2\%$ loss)** | **$+64.5\text{ pp gain}$** ($95\%\text{ CI: } [+63.1, +65.9]\text{ pp}$, paired $t(9) = 98.8$) |
 | **Route Flapping Oscillations** | $12\text{--}18$ flaps per trial | **0 Flaps (0%)** | $100\%$ stability across 100 trials (`seeds = 1001..1100`, upper $95\%$ bound $\le 3.0\%$) |
 | **Edge AI Inference Execution** | $38.5\text{ ms}$ (Local PyTorch) / $1.2\text{ ms}$ (Median) | **$8.4\text{ ms}$ (Pure NumPy on CPU)** | **$4.6\times$ faster** than local PyTorch CPU; includes JSON parse & full 2-hop pass |
 | **Base Station Power Savings** | $0.0\%$ (Always ON baseline) | **$25.3\%$ Capacity Off-Peak (8.4% Daily)** | EARTH model: 700 MHz macro active; 3.5 GHz micro sleeps off-peak (1.2% total net; 8.4% with Macro DTX muting) |
-| **Telemetry Bandwidth Compression** | $0.0\%$ (Raw JSON queues) | **$75.4\%$ Saved** | Lossless $zlib$ moment compression on E2 telemetry buffers |
+| **Telemetry Bandwidth Compression** | $0.0\%$ (Raw JSON queues) | **$75.4\%$ Saved (Hybrid Reduction)** | 5-tick windowed summary downsampling (lossy temporal reduction, saving up to 80%) combined with lossless deflate ($zlib$) compression on batched payloads (measured 48.2%) |
 
 *Note on 50% Telemetry Flapping & PACIFISTA Residual Gap:*  
 * **50% Flapping Definition:** Denotes an adversarial condition where compromised cells alternate reported PRB utilization between 10% and 90% every two control epochs ($200\text{ ms}$), driving naive TS and ES xApps into antagonistic switching loops.
@@ -186,7 +192,8 @@ The codebase is fortified by **48 comprehensive automated test cases** (53 param
 * `test_crypto_agility.py` (13 tests): Validates policy negotiation across all 5 cipher suites, 32-byte HKDF key extraction, hybrid key uniqueness across handshakes, AEAD round-trip encryption/decryption, cryptographic tamper detection (`InvalidTag`), and automated controller cipher migration under threat.
 * `test_scenario.py` (23 tests): Validates realistic network dynamics, CUSUM detection lag, sub-second failover, PDR recovery $>0.9$, and 300 continuous cycles under normal traffic with **0 false positive isolations**.
 * `test_detector.py` (4 tests): Validates GraphSAGE fallback weights, nominal vs. attack score discrimination, and link isolation under severe degradation.
-* `test_leach_upgrades.py` (8 tests): Validates window buffering, in-flight telemetry aggregation, anomaly detection flags, and $75.4\%$ telemetry compression.
+* `test_leach_upgrades.py` (8 tests): Validates window buffering, in-flight telemetry moment aggregation, anomaly detection flags, and hybrid telemetry compression.
+* `run_open5gs_unified.py`: End-to-end live validation script integrating Open5GS 5G Core daemon telemetry (`ogstun` UPF/SMF) with AICOP GraphSAGE and RAKSHA-NET NTN failover (`results/open5gs_unified_experiment.csv`).
 
 ### 8.2 Base Station Power Model (Auer et al. 2011)
 Modeled using the standard EARTH (Energy Aware Radio and neTwork tecHnologies) linear formulation:

@@ -73,7 +73,7 @@ def main():
     print("\n" + "=" * 90)
     print("   UNIFIED AICOP + RAKSHA-NET AUTONOMOUS RESILIENCE CONTROLLER")
     print("   Joint Terrestrial O-RAN xApp Coordination + 5G NTN Post-Quantum Satellite Failover")
-    print("   IIITDM Jabalpur | Dr. Satish Kumar Tiwari | G Rahul Reddy & Rajarwar Deependra")
+    print("   IIITDM Jabalpur | Dr. Satish Kumar Tiwari | G Rahul Reddy")
     print("=" * 90 + "\n")
 
     num_cells = 12

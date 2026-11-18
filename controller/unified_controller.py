@@ -27,7 +27,7 @@ except (ImportError, ModuleNotFoundError):
         def __init__(self):
             self.rekey_count = 0
             self.backend = "liboqs-ML-KEM-768 (Calibrated: 65us)"
-        def on_threat(self, link_id: str):
+        def on_threat(self, t_ms: int = 0, link_id: str = "", anomaly: float = 0.0, **kwargs):
             self.rekey_count += 1
             return True
 from common.interfaces import LinkTelemetry, Route, RouteDecision
@@ -139,7 +139,7 @@ class UnifiedController:
                 failover_ms = 190.0  # Calibrated 190ms empirical failover
                 
                 # Invoke Post-Quantum Cryptographic Handshake (NIST FIPS 203 ML-KEM-768)
-                self.sec.on_threat(primary_link)
+                self.sec.on_threat(t_ms=tick * 100, link_id=primary_link, anomaly=ntn_threat)
                 self.pqc_rekey_count += 1
                 status_notes.append("AUTONOMOUS_NTN_FAILOVER_TO_LEO2 + PQC_ML_KEM_768_REKEY")
 

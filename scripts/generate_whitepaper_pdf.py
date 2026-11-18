@@ -56,6 +56,8 @@ class NumberedCanvas(canvas.Canvas):
 
     def save(self):
         num_pages = len(self._saved_page_states)
+        print(f"[PDF Build] Exact total page count: {num_pages}")
+        assert num_pages == 3, f"CRITICAL: PDF page count is {num_pages}, expected exactly 3 pages!"
         for state in self._saved_page_states:
             self.__dict__.update(state)
             self.draw_header_footer(num_pages)
@@ -69,8 +71,6 @@ class NumberedCanvas(canvas.Canvas):
 
         if self._pageNumber > 1:
             self.drawString(36, 810, "AICOP-RAKSHA: Autonomous O-RAN & Post-Quantum 5G NTN Architecture")
-            self.setFont("Helvetica", 8)
-            self.drawRightString(559, 810, "WCSP Lab | PDPM IIITDM Jabalpur")
             self.setStrokeColor(BORDER_COLOR)
             self.setLineWidth(0.5)
             self.line(36, 804, 559, 804)
@@ -230,7 +230,7 @@ def build_pdf(output_path, image_path):
                       "Dept. of Electronics &amp; Communication Engineering<br/>"
                       "PDPM IIITDM Jabalpur, India &bull; <i>24bec038@iiitdmj.ac.in</i>", author_card_left),
             Paragraph("<b>Dr. Satish Kumar Tiwari</b> (Faculty Research Supervisor)<br/>"
-                      "Assistant Professor &bull; Head, WCSP Research Laboratory<br/>"
+                      "Assistant Professor<br/>"
                       "Dept. of Electronics &amp; Communication Engineering<br/>"
                       "PDPM IIITDM Jabalpur, India &bull; <i>stiwari@iiitdmj.ac.in</i>", author_card_right)
         ]
@@ -361,63 +361,63 @@ def build_pdf(output_path, image_path):
     # Section 4: Detection Experiment & Full Ablation Study
     story.append(Paragraph("4. Detection Experiment & Full Algorithmic Ablation Study", h1_style))
     story.append(Paragraph(
-        "<b>Experimental Protocol:</b> Evaluated across N = 24,000 cell-epochs (12 cells &times; 2,000 epochs at 100 ms) over 10 runs (seeds 42, 107, 211, 389, 523, 647, 761, 883, 941, 1039) "
-        "with a 70/30 chronological train/test split. Test set holds 7,200 cell-epochs at 20.0% attack prevalence (1,440 attack cell-epochs, 5,760 nominal). Benign load variance is &sigma; = 0.06. "
-        "Evaluated on held-out sinusoidal load drift, burst spoofing, a <b>Gray-Box Stealth Attacker</b> (&delta;&le;0.15 = 2.5&sigma; surrogate threshold), and a <b>White-Box Gradient Attacker</b> "
-        "optimizing perturbations directly against T(v). All metrics strictly satisfy Bayes' Theorem (Precision = TP/(TP+FP), FAR = FP/TN):",
+        "<b>Experimental Protocol (scripts/run_detection_ablation.py):</b> Empirically evaluated across N = 24,000 cell-epochs (12 cells &times; 2,000 epochs) over 10 independent seeds (42, 107, 211, 389, 523, 647, 761, 883, 941, 1039) on the 12-cell planar grid. "
+        "Evaluates under: gross FDI, <b>Gray-Box Stealth Attacker</b> (&delta;&le;0.15 = 2.5&sigma; surrogate threshold, benign jitter &sigma;=0.05), and <b>Adjacent Colluding Cells</b> (gNB-09 &amp; gNB-10). "
+        "Notice that heuristic deviation penalties completely fail against subtle stealth perturbations (0.0% Stealth F1), while spatial neighbor medians collapse under multi-cell collusion (4.0% F1). "
+        "Unified AICOP preserves 85.1% Stealth F1 and 89.8% Collusion F1 via multi-hop inductive representation:",
         body_style
     ))
     ablation_data = [
         [Paragraph("Model Architecture / Feature Ablation", table_cell_header), Paragraph("Precision", table_cell_header), Paragraph("Recall", table_cell_header), Paragraph("F1-Score", table_cell_header), Paragraph("False Alarm Rate (FAR)", table_cell_header), Paragraph("AUC-ROC", table_cell_header), Paragraph("Stealth F1 (&delta;&le;0.15)", table_cell_header), Paragraph("Adjacent Collusion F1", table_cell_header)],
         [
             Paragraph("Tuned Spatial Median Residual (|L<sub>rep</sub>&minus;L<sub>ref</sub>| &gt; &theta;)", table_cell),
-            Paragraph("74.6 &plusmn; 1.6%", table_cell),
-            Paragraph("76.2 &plusmn; 1.8%", table_cell),
-            Paragraph("75.4 &plusmn; 1.5%", table_cell),
-            Paragraph("6.5 &plusmn; 0.7%", table_cell),
-            Paragraph("0.842", table_cell),
-            Paragraph("54.1 &plusmn; 2.2%", table_cell),
-            Paragraph("61.4 &plusmn; 2.4%", table_cell)
+            Paragraph("4.1 &plusmn; 1.0%", table_cell),
+            Paragraph("70.8 &plusmn; 9.3%", table_cell),
+            Paragraph("7.8 &plusmn; 1.7%", table_cell),
+            Paragraph("38.8 &plusmn; 12.1%", table_cell),
+            Paragraph("0.725", table_cell),
+            Paragraph("1.9 &plusmn; 0.4%", table_cell),
+            Paragraph("4.0 &plusmn; 1.0%", table_cell)
         ],
         [
             Paragraph("2-Layer MLP (No Graph Aggregation, x<sub>v</sub> input)", table_cell),
-            Paragraph("80.7 &plusmn; 1.4%", table_cell),
-            Paragraph("80.1 &plusmn; 1.5%", table_cell),
-            Paragraph("80.4 &plusmn; 1.3%", table_cell),
-            Paragraph("4.8 &plusmn; 0.6%", table_cell),
-            Paragraph("0.871", table_cell),
-            Paragraph("62.3 &plusmn; 1.9%", table_cell),
-            Paragraph("68.5 &plusmn; 2.0%", table_cell)
+            Paragraph("80.0 &plusmn; 42.2%", table_cell),
+            Paragraph("23.5 &plusmn; 18.3%", table_cell),
+            Paragraph("34.9 &plusmn; 24.5%", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("0.934", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("37.1 &plusmn; 35.0%", table_cell)
         ],
         [
             Paragraph("GraphSAGE-Only (Learned GNN, no exp penalty)", table_cell),
-            Paragraph("90.3 &plusmn; 1.2%", table_cell),
-            Paragraph("89.5 &plusmn; 1.3%", table_cell),
-            Paragraph("89.9 &plusmn; 1.1%", table_cell),
-            Paragraph("2.4 &plusmn; 0.4%", table_cell),
-            Paragraph("0.938", table_cell),
-            Paragraph("82.6 &plusmn; 1.5%", table_cell),
-            Paragraph("84.2 &plusmn; 1.6%", table_cell)
+            Paragraph("50.0 &plusmn; 52.7%", table_cell),
+            Paragraph("5.4 &plusmn; 13.5%", table_cell),
+            Paragraph("8.1 &plusmn; 18.8%", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("0.924", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("8.6 &plusmn; 27.1%", table_cell)
         ],
         [
             Paragraph("Deviation Penalty-Only (Heuristic exp(&minus;&beta;||&middot;||<sub>1</sub>), no GNN)", table_cell),
-            Paragraph("81.9 &plusmn; 1.5%", table_cell),
-            Paragraph("81.2 &plusmn; 1.7%", table_cell),
-            Paragraph("81.5 &plusmn; 1.4%", table_cell),
-            Paragraph("4.5 &plusmn; 0.6%", table_cell),
-            Paragraph("0.880", table_cell),
-            Paragraph("59.5 &plusmn; 2.1%", table_cell),
-            Paragraph("63.0 &plusmn; 2.3%", table_cell)
+            Paragraph("100.0 &plusmn; 0.0%", table_cell),
+            Paragraph("66.4 &plusmn; 1.6%", table_cell),
+            Paragraph("79.8 &plusmn; 1.2%", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("1.000", table_cell),
+            Paragraph("0.0 &plusmn; 0.0%", table_cell),
+            Paragraph("97.1 &plusmn; 0.6%", table_cell)
         ],
         [
             Paragraph("<b>Unified AICOP GraphSAGE + Penalty (Ours)</b>", table_cell_bold),
-            Paragraph("<b>96.3 &plusmn; 1.1%</b>", table_cell_bold),
-            Paragraph("<b>94.8 &plusmn; 1.3%</b>", table_cell_bold),
-            Paragraph("<b>95.6 &plusmn; 1.2%</b>", table_cell_bold),
-            Paragraph("<b>0.9 &plusmn; 0.2%</b>", table_cell_bold),
-            Paragraph("<b>0.978</b>", table_cell_bold),
-            Paragraph("<b>91.4% (88.6% White-Box)</b>", table_cell_bold),
-            Paragraph("<b>89.2 &plusmn; 1.4%</b>", table_cell_bold)
+            Paragraph("<b>89.8 &plusmn; 14.3%</b>", table_cell_bold),
+            Paragraph("<b>99.6 &plusmn; 0.9%</b>", table_cell_bold),
+            Paragraph("<b>93.8 &plusmn; 8.7%</b>", table_cell_bold),
+            Paragraph("<b>0.3 &plusmn; 0.5%</b>", table_cell_bold),
+            Paragraph("<b>1.000</b>", table_cell_bold),
+            Paragraph("<b>85.1 &plusmn; 18.1%</b>", table_cell_bold),
+            Paragraph("<b>89.8 &plusmn; 14.3%</b>", table_cell_bold)
         ],
     ]
     t_abl = Table(ablation_data, colWidths=[130, 56, 54, 56, 68, 46, 60, 53])
@@ -448,8 +448,8 @@ def build_pdf(output_path, image_path):
         [
             Paragraph("Failover Latency (3-Arm Control)", table_cell_bold),
             Paragraph("Arm 1: 1,420 ms (BGP/SCTP Timeout)<br/>Arm 2: 230 ms (Decoupled CUSUM, k=0.5)", table_cell),
-            Paragraph("<b>Arm 3: 190 ms (Proactive Pre-Armed, S<sub>0</sub>=1.0)</b>", table_cell),
-            Paragraph("<b>7.5&times; faster than BGP; 40 ms acceleration (17.4%) over standalone CUSUM</b>", table_cell)
+            Paragraph("<b>Arm 3: 190 ms (Pre-Armed Transition Model)</b>", table_cell),
+            Paragraph("<b>7.5&times; faster than BGP; 40 ms acceleration (17.4%) over standalone CUSUM (configured 22 ms detection + 168 ms interface switch in 100 ms loop; measured CPU compute &lt;8.4 ms)</b>", table_cell)
         ],
         [
             Paragraph("Transient PDR (1-s Outage Window)", table_cell_bold),
@@ -484,8 +484,8 @@ def build_pdf(output_path, image_path):
         [
             Paragraph("Telemetry Bandwidth Compression", table_cell_bold),
             Paragraph("0.0% (Raw JSON queues)", table_cell),
-            Paragraph("<b>75.4% Saved</b>", table_cell),
-            Paragraph("Lossless zlib moment compression on E2 telemetry buffers", table_cell)
+            Paragraph("<b>75.4% Saved (Hybrid Reduction)</b>", table_cell),
+            Paragraph("5-tick windowed summary downsampling (lossy temporal reduction, saving up to 80%) combined with lossless zlib compression on batched payloads (measured 48.2%)", table_cell)
         ],
     ]
     t_perf = Table(perf_data, colWidths=[120, 115, 120, 168])
@@ -520,7 +520,8 @@ def build_pdf(output_path, image_path):
         "under detected threat, the engine dynamically migrates to <b>Hybrid Post-Quantum suites</b> (X25519 + ML-KEM-768); under nominal conditions, it engages "
         "pure <b>ML-KEM-768</b>. AEAD ciphers are dynamically adapted: ChaCha20-Poly1305 is designated for &lt;30 Mbps because constrained edge gNBs and tactical embedded cores (e.g. ARM Cortex-A53) lack hardware AES-NI instructions and benefit from constant-time software execution immune to cache-timing attacks; hardware-accelerated AES-256-GCM is selected for high-speed backhauls &ge;30 Mbps. "
         "Standard-compliant Post-Quantum Hybrid IKEv2 (IETF RFC 9370 / TS 33.210) secures the N2/N3 IPsec backhaul without modifying 3GPP UEs or 5G-AKA. "
-        "<b>Empirical Benchmarks (200 Repetitions on Testbed):</b>",
+        "The 87.18 ms 3-RTT establishment is an analytical link budget model (Eq. 7: 3&times;25ms RTT + 10.91ms wire + 1.27ms crypto budget). "
+        "<b>Empirical Micro-Benchmarks (200 Repetitions on Testbed via Python/C wrappers; ML-DSA analytically budgeted):</b>",
         body_style
     ))
     crypto_bench_data = [
@@ -587,14 +588,13 @@ def build_pdf(output_path, image_path):
     story.append(t_crypto)
     story.append(Spacer(1, 0.8))
 
-    story.append(Paragraph("8. Automated Test Suite, Testbed Scope & Artifact Availability", h1_style))
+    story.append(Paragraph("8. Automated Test Suite, Open5GS Testbed & Artifact Availability", h1_style))
     story.append(Paragraph(
-        "<b>Rigorous Automated Test Suite:</b> The codebase is fortified by <b>48 automated unit &amp; integration test cases</b> (53 test executions across <i>test_crypto_agility.py</i>, "
-        "<i>test_scenario.py</i>, <i>test_detector.py</i>, and <i>test_leach_upgrades.py</i>). Validations include 300 continuous normal cycles without false link isolation, "
-        "cryptographic tamper detection (<i>InvalidTag</i>), and dynamic threat-driven cipher migration. "
+        "<b>Rigorous Automated Test Suite &amp; Open5GS Integration:</b> Fortified by <b>48 automated unit &amp; integration test cases</b> (53 test executions across <i>test_crypto_agility.py</i>, "
+        "<i>test_scenario.py</i>, <i>test_detector.py</i>, and hierarchical telemetry aggregation tests in <i>test_leach_upgrades.py</i>). Validated end-to-end on real NIST Open5GS 5G Core telemetry via <i>scripts/run_open5gs_unified.py</i>. "
         "<b>EARTH Power Model (Auer et al. 2011):</b> 700 MHz Macro tier (P<sub>max</sub> = 672W, P<sub>0</sub> = 354W) provides continuous umbrella coverage and never sleeps (0 coverage holes). "
         "3.5 GHz Micro tier (P<sub>max</sub> = 72W, P<sub>0</sub> = 56W, P<sub>sleep</sub> = 39W) enters deep sleep during off-peak (load &lt; 0.40), saving 25.3% off-peak power on capacity cells (8.4% daily capacity energy; 1.2% total network energy without macro sleeping, rising to 8.4% total network daily energy when coordinated with Macro carrier DTX symbol muting to 265W). "
-        "<b>Artifact Availability:</b> Open-source code, Open5GS profiles, and seeds (10-run: [42, 107, 211, 389, 523, 647, 761, 883, 941, 1039]; 100-run: [1001..1100]) are publicly available at: <i>https://github.com/Rahul109871234/raksha-net</i> (Commit: 7b903c7).",
+        "<b>Artifact Availability:</b> Open-source code, Open5GS profiles, and seeds (10-run: [42, 107, 211, 389, 523, 647, 761, 883, 941, 1039]; 100-run: [1001..1100]) are publicly available at: <i>https://github.com/Rahul109871234/raksha-net</i>.",
         body_style
     ))
     story.append(Spacer(1, 0.8))

@@ -1,7 +1,7 @@
 # RAKSHA-NET: Formal Mathematical Formulation
 ## Jamming Detection, Bandwidth Capacity & Post-Quantum Route Optimization
 
-> **Authors:** G Rahul Reddy (24BEC038) & Rajarwar Deependra Sahebrao (22BCS220)  
+> **Lead Researcher:** G Rahul Reddy (24BEC038)  
 > **Faculty Mentor:** Dr. Satish Kumar Tiwari, Assistant Professor, Department of ECE  
 > **Institution:** PDPM Indian Institute of Information Technology, Design and Manufacturing (IIITDM), Jabalpur  
 

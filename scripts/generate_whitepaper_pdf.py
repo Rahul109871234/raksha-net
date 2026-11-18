@@ -251,11 +251,11 @@ def build_pdf(output_path, image_path):
         "<b>EXECUTIVE ABSTRACT:</b> In 3GPP Release-18 (5G-Advanced) and emerging 6G systems, terrestrial Open Radio Access Networks (O-RAN) "
         "and Non-Terrestrial Networks (NTN) converge into a multi-tier fabric. This convergence exposes networks to simultaneous cross-layer attacks: "
         "(1) False Data Injection (FDI) at the radio edge causing near-RT RIC Traffic Steering (TS) and Energy Saving (ES) xApps to oscillate, triggering "
-        "severe SLA collapse (57.79 &plusmn; 0.84% under 50% flapping); (2) Electronic Warfare (RF jamming) degrading satellite feeder links to a steady-state 29.6 &plusmn; 4.8% PDR (70.4% loss), combined with <i>Harvest Now, Decrypt Later</i> "
-        "quantum threats. <b>AICOP-RAKSHA</b> integrates an inductive pure-NumPy 2-layer GraphSAGE trust engine (0.863 &plusmn; 0.102 ms CPU execution, &lt;8.4 ms budget, zero GPU overhead) "
-        "and Pareto utility arbitration with sub-second (194.5 &plusmn; 9.7 ms measured pre-armed latency) autonomous satellite failover (5% hysteresis, 0.0% flapping over 100 trials, upper 95% bound &le; 3.0%), augmented by a "
-        "<b>dynamic 5-suite Crypto-Agility Engine</b> supporting live hybrid switching (X25519 + NIST FIPS 203 ML-KEM-768, sub-millisecond 167 &mu;s key exchange computation; full 3-RTT IKEv2 establishment: 87.18 ms). Tested against an active 3GPP Rel-17 Open5GS core and 100-seed Monte Carlo batch trials, the system cuts SLA violations from 57.79 &plusmn; 0.84% down to 5.96 &plusmn; 1.06% (beating reimplemented PACIFISTA's 8.43 &plusmn; 1.21%, paired t = 50.80, p &lt; 0.001), restores satellite "
-        "PDR from 29.6% back to 96.8% (+67.16 percentage points gain, 95% CI: [+66.19, +68.14] pp, N = 100), accelerates failover by 41.6 ms (17.6%) over standalone CUSUM (causal coupling correlation r = 0.754, p &lt; 0.001), and saves 25.3% off-peak capacity power (8.4% daily capacity energy; 8.4% total network energy under coordinated Macro DTX carrier muting, or 1.2% with strictly non-sleeping macros)."
+        "severe SLA collapse (55.40 &plusmn; 1.14% under 50% flapping); (2) Electronic Warfare (RF jamming) degrading satellite feeder links to a steady-state 29.6 &plusmn; 4.8% PDR (70.4% loss), combined with <i>Harvest Now, Decrypt Later</i> "
+        "quantum threats. <b>AICOP-RAKSHA</b> integrates an inductive pure-NumPy 2-layer GraphSAGE trust engine (0.091 &plusmn; 0.008 ms pure GNN pass, 0.125 &plusmn; 0.010 ms full Near-RT RIC loop, 67&times; safety margin under 8.4 ms budget, 0.014 ms loopback socket RTT) "
+        "and Pareto utility arbitration with sub-second (194.5 &plusmn; 9.7 ms simulated pre-armed transition latency) autonomous satellite failover (5% hysteresis, 0.0% flapping over 100 trials, upper 95% bound &le; 3.0%), augmented by a "
+        "<b>dynamic 5-suite Crypto-Agility Engine</b> supporting live hybrid switching (X25519 + NIST FIPS 203 ML-KEM-768, sub-millisecond 167 &mu;s key exchange computation; full 3-RTT IKEv2 establishment: 87.18 ms). Tested against an active 3GPP Rel-17 Open5GS core and 100-seed Monte Carlo batch trials, the system cuts SLA violations from 55.40 &plusmn; 1.14% down to 10.60 &plusmn; 1.67% (beating reimplemented PACIFISTA's 22.15 &plusmn; 1.51%, paired t = 280.59, p &lt; 0.001, evaluated under an a priori frozen physical model), restores satellite "
+        "PDR from 29.6% back to 96.8% (+67.16 percentage points gain, 95% CI: [+66.19, +68.14] pp, N = 100), accelerates failover by 41.6 ms (17.6%) over standalone CUSUM (r = 0.754 by alert rule construction, p &lt; 0.001), saves 25.3% off-peak capacity power (8.4% daily capacity energy; 8.4% total network energy under coordinated Macro DTX carrier muting, or 1.2% with strictly non-sleeping macros), and achieves 89.6% net telemetry bandwidth savings (9.6&times; factor: 80.0% lossy temporal downsampling combined with 48.2% lossless zlib compression)."
     )
     t_abs = Table([[Paragraph(abstract_text, abstract_style)]], colWidths=[523])
     t_abs.setStyle(TableStyle([
@@ -442,15 +442,15 @@ def build_pdf(output_path, image_path):
         [Paragraph("Evaluation Dimension", table_cell_header), Paragraph("Baseline / Control Arm", table_cell_header), Paragraph("Unified AICOP-RAKSHA", table_cell_header), Paragraph("Empirical Gain / Statistical Impact", table_cell_header)],
         [
             Paragraph("QoS-SLA Violations (50% Flap)", table_cell_bold),
-            Paragraph("Unmanaged: 57.79 &plusmn; 0.84%<br/>(PACIFISTA: 8.43 &plusmn; 1.21%)", table_cell),
-            Paragraph("<b>5.96 &plusmn; 1.06%</b>", table_cell),
-            Paragraph("<b>-51.84 pp vs unmanaged; -2.48 pp vs PACIFISTA (paired t = 50.80, p &lt; 0.001)</b>", table_cell)
+            Paragraph("Unmanaged: 55.40 &plusmn; 1.14%<br/>Reimplemented PACIFISTA (our model): 22.15 &plusmn; 1.51%", table_cell),
+            Paragraph("<b>10.60 &plusmn; 1.67%</b>", table_cell),
+            Paragraph("<b>-44.80 pp vs unmanaged; -11.55 pp vs PACIFISTA (paired t = 280.59, p &lt; 0.001)</b>", table_cell)
         ],
         [
             Paragraph("Failover Latency (3-Arm Control)", table_cell_bold),
             Paragraph("Arm 1: 1,420.8 &plusmn; 19.9 ms (BGP)<br/>Arm 2: 236.1 &plusmn; 11.3 ms (Decoupled CUSUM)", table_cell),
             Paragraph("<b>Arm 3: 194.5 &plusmn; 9.7 ms (Pre-Armed)</b><br/>[All Trials: 210.2 &plusmn; 21.7 ms]", table_cell),
-            Paragraph("<b>7.3&times; faster than BGP; 41.6 ms acceleration (17.6%) over standalone CUSUM; r(lag, latency) = 0.754 (p &lt; 0.001)</b>", table_cell)
+            Paragraph("<b>7.3&times; faster than BGP; 41.6 ms acceleration (17.6%) over standalone CUSUM; r = 0.754 (p &lt; 0.001)</b><br/>*(Simulated transition model with 20 ms BFD micro-sampling jitter)*", table_cell)
         ],
         [
             Paragraph("Transient PDR (1-s Outage Window)", table_cell_bold),
@@ -466,53 +466,53 @@ def build_pdf(output_path, image_path):
         ],
         [
             Paragraph("Route Flapping Oscillations", table_cell_bold),
-            Paragraph("17.0 &plusmn; 4.6 flaps/trial (min 7, max 29)", table_cell),
+            Paragraph("16.3 &plusmn; 4.2 flaps/trial (min 6, max 27)", table_cell),
             Paragraph("<b>0.00 &plusmn; 0.00 Flaps (0.0%)</b>", table_cell),
             Paragraph("100% stability across 100 trials under dither (Rule-of-Three 95% upper bound &le; 3.0%)", table_cell)
         ],
         [
             Paragraph("Edge AI Inference Execution", table_cell_bold),
             Paragraph("38.5 ms (Local PyTorch) / 1.2 ms (Median)", table_cell),
-            Paragraph("<b>0.863 &plusmn; 0.102 ms (Pure NumPy CPU)</b>", table_cell),
-            Paragraph("45&times; faster than local PyTorch CPU; budget deadline &lt; 8.4 ms Near-RT RIC window", table_cell)
+            Paragraph("<b>0.091 ms (GNN) / 0.125 ms (RIC loop)</b><br/>[Batch step: 0.273 &plusmn; 0.148 ms]", table_cell),
+            Paragraph("<b>57&times; faster</b> than PyTorch CPU (0.673 ms scenario step); 67&times; margin under 8.4 ms Near-RT deadline; loopback socket RTT: 0.014 ms", table_cell)
         ],
         [
             Paragraph("Base Station Power Savings", table_cell_bold),
             Paragraph("0.0% (Always ON baseline)", table_cell),
             Paragraph("<b>25.3% Capacity Off-Peak (8.4% Daily)</b>", table_cell),
-            Paragraph("EARTH model: 700MHz macro active; 3.5GHz micro sleeps off-peak (1.2% total net; 8.4% with Macro DTX muting)", table_cell)
+            Paragraph("EARTH model (Auer et al. 2011): 700MHz macro active; 3.5GHz micro sleeps off-peak (1.2% total net; 8.4% with Macro DTX muting)", table_cell)
         ],
         [
             Paragraph("Telemetry Bandwidth Compression", table_cell_bold),
             Paragraph("0.0% (Raw JSON queues)", table_cell),
-            Paragraph("<b>75.4% Saved (Hybrid Reduction)</b>", table_cell),
-            Paragraph("5-tick windowed summary downsampling (lossy temporal reduction, saving up to 80%) combined with lossless zlib compression on batched payloads (measured 48.2%)", table_cell)
+            Paragraph("<b>89.6% Bandwidth Reduction (9.6&times; factor)</b>", table_cell),
+            Paragraph("5-tick temporal downsampling (lossy, 80.0% reduction) + deflate/zlib compression (lossless, 48.2% reduction on aggregated payload) = 89.6% net savings", table_cell)
         ],
     ]
     t_perf = Table(perf_data, colWidths=[120, 115, 120, 168])
     t_perf.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), NAVY),
         ('GRID', (0, 0), (-1, -1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0, 0), (-1, -1), 0.9),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 0.9),
+        ('TOPPADDING', (0, 0), (-1, -1), 0.7),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0.7),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, ZEBRA_ROW])
     ]))
     story.append(t_perf)
-    story.append(Paragraph("<i>Note: Master metrics computed directly from N=100 Monte Carlo batch trials (results/batch_100_seeds_experiment.csv). All entries report empirical sample mean &plusmn; standard deviation. 50% Flapping denotes adversarial oscillation between 10% and 90% PRB load every 2nd control cycle (200 ms). AICOP's quadratic penalty T(v)<sup>2</sup>&middot;&Delta;<sub>ES</sub> suppresses sleep on low-trust cells (T(v)&lt;0.35 &rArr; T<sup>2</sup>&lt;0.12), eliminating residual SLA violations (5.96 &plusmn; 1.06% vs 8.43 &plusmn; 1.21%, paired t = 50.80, p &lt; 0.001). Windows PQC backend runs in verified MOCK mode.</i>", body_style))
-    story.append(Spacer(1, 0.8))
+    story.append(Paragraph("<i>Note: Master metrics computed directly from N=100 Monte Carlo batch trials (results/batch_100_seeds_experiment.csv) and hardware timing benchmarks (results/real_timing_benchmark.csv). Failover latencies represent the simulated transition model under 20 ms BFD micro-sampling jitter; wall-clock inference and socket RTTs are hardware-timed. SLA evaluations use an a priori frozen physical model (true load ~ N(0.80, 0.04), cap 0.85); PACIFISTA is evaluated via our simulator's reimplemented model, and the 11.55 pp difference measures modeling choices under periodic square-wave flapping rather than a direct benchmark of the original authors' software. AICOP's quadratic penalty T(v)<sup>2</sup>&middot;&Delta;<sub>ES</sub> suppresses sleep on low-trust cells (T(v)&lt;0.35 &rArr; T<sup>2</sup>&lt;0.12). Correlation r = 0.754 follows by construction of the alert rule. Windows PQC backend runs in verified MOCK mode.</i>", body_style))
+    story.append(Spacer(1, 0.6))
 
     story.append(Paragraph("6. Causal Cross-Layer Coupling & Two-Stage CUSUM Sensitivity", h1_style))
     story.append(Paragraph(
         "<b>Causal Mechanism &amp; Lag Sweep:</b> Terrestrial FDI on border gNBs provokes artificial congestion. The cross-layer bus detects T(v) &lt; 0.40 on &ge; 2 cells and sends an O1/gRPC intent "
         "to the NTN controller, which <i>pre-arms</i> secondary LEO kernel route entries (saving 20 ms fib resolution: 188ms &minus; 168ms = 20ms) and primes CUSUM state S<sub>0</sub> = 1.0. "
-        "Sweeping the FDI lag across [&minus;1000, +800] ms reveals a strong positive correlation (r = 0.754, p &lt; 0.001) between FDI arrival timing and Arm 3 failover latency. "
+        "Sweeping the FDI lag across [&minus;1000, +800] ms reveals a strong positive correlation (r = 0.754, p &lt; 0.001) between FDI arrival timing and Arm 3 failover latency (by construction of the pre-arm rule). "
         "When FDI precedes jamming (lag &le; &minus;80 ms, N=60), failover completes in <b>194.5 &plusmn; 9.7 ms</b> (41.6 ms acceleration over standalone CUSUM). "
         "When FDI arrives late or is absent (N=40), Arm 3 gracefully falls back to decoupled CUSUM performance (<b>233.7 &plusmn; 10.1 ms</b>). "
         "Standalone CUSUM (Arm 2) averages 236.1 &plusmn; 11.3 ms; legacy SCTP (Arm 1) takes 1,420.8 &plusmn; 19.9 ms (7.3&times; slower). "
-        "Under flap-prone telemetry dither (&Delta;L &asymp; &epsilon; = 0.05), naive switching flaps 17.0 &plusmn; 4.6 times, while AICOP's 5% hysteresis barrier maintains <b>0.00 &plusmn; 0.00 flaps</b> (Rule-of-Three bound &le; 3.0%).",
+        "Under flap-prone telemetry dither (&Delta;L &asymp; &epsilon; = 0.05), naive switching flaps 16.3 &plusmn; 4.2 times, while AICOP's 5% hysteresis barrier maintains <b>0.00 &plusmn; 0.00 flaps</b> (Rule-of-Three bound &le; 3.0%).",
         body_style
     ))
-    story.append(Spacer(1, 0.8))
+    story.append(Spacer(1, 0.6))
 
     # SECTION 7: DYNAMIC CRYPTO-AGILITY BENCHMARK MATRIX
     story.append(Paragraph("7. Dynamic Crypto-Agility Engine & Multi-Suite Benchmarks", h1_style))

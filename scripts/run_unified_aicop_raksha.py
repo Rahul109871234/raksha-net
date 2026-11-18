@@ -86,6 +86,7 @@ def generate_ntn_telemetry(active_route: str, is_jammed: bool, tick_ms: int, rng
 def main():
     print("\n" + "=" * 92)
     print("   UNIFIED AICOP + RAKSHA-NET AUTONOMOUS RESILIENCE CONTROLLER")
+    print("   [ILLUSTRATIVE SINGLE-TRACE EXECUTION (SEED=42)]")
     print("   Joint Terrestrial O-RAN xApp Coordination + 5G NTN Post-Quantum Satellite Failover")
     print("   PDPM IIITDM Jabalpur | Dr. Satish Kumar Tiwari | G Rahul Reddy")
     print("=" * 92 + "\n")
@@ -190,10 +191,11 @@ def main():
     expected_corrupt = len(corrupted_gnbs)
 
     print("\n[EMPIRICAL EVALUATION RESULTS (COMPUTED FROM RUN LOGS)]")
+    print(f"  • Trace Characterization       : Single illustrative run (Seed=42). See results/batch_100_seeds_experiment.csv for N=100 statistics.")
     print(f"  • Terrestrial O-RAN Resilience : AICOP GraphSAGE identified {tp_detected}/{expected_corrupt} compromised cells (TP={tp_detected}, FP=0).")
     print(f"  • SLA Violation Containment   : QoS-SLA risk held to {mean_managed_sla:.1f}% under attack (vs {mean_unmanaged_sla:.1f}% unmanaged baseline).")
     print(f"  • Causal Cross-Layer Coupling : Terrestrial FDI at T+04 triggered proactive pre-arming alert (priming CUSUM S0=1.0).")
-    print(f"  • Autonomous Route Failover   : Switched R1 -> R2 at T+{failover_tick:02d}s (Calibrated pre-armed transition: 190.0 ms).")
+    print(f"  • Autonomous Route Failover   : Switched R1 -> R2 at T+{failover_tick:02d}s (Configured transition parameter: 190.0 ms; discrete step: 1000 ms).")
     print(f"  • Space Link Delivery Recovery: PDR restored from {mean_during:.1f}% (jammed) to {mean_after:.1f}% (+{net_pdr_gain:.1f} pp net recovery).")
     print(f"  • Flapping Stability          : {route_flaps - 1} Flaps (Flap-free transition maintained across 5% hysteresis barrier).")
     print(f"  • Edge AI Execution Time      : {mean_ctrl_ms:.3f} ms wall-clock CPU inference (sub-10ms Near-RT RIC budget satisfied).")

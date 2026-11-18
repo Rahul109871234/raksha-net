@@ -116,12 +116,13 @@ class UnifiedController:
         unmanaged_risk = sum(d.get("unmanaged_sla_risk", 0.0) for d in ran_decisions.values()) / max(1, self.num_cells)
 
         # Cross-layer intent: Proactive Pre-Arming (Section 6)
-        # If border gNBs corrupted or degradation alert fired, prime CUSUM S_0 = 1.0
+        # If border gNBs corrupted or degradation alert fired, prime CUSUM S_0 = 1.0 (only while on primary R1)
         pre_armed_this_cycle = False
-        if self.enable_pre_arm and (corrupted_cells >= 2 or ran_degradation >= 0.20):
-            self.detector.pre_arm('GW-LEO1', primed_s0=1.0)
-            self.is_pre_armed = True
-            pre_armed_this_cycle = True
+        if self.enable_pre_arm and self.active_route_id == "R1" and (corrupted_cells >= 2 or ran_degradation >= 0.20):
+            if not self.is_pre_armed:
+                self.detector.pre_arm('GW-LEO1', primed_s0=1.0)
+                self.is_pre_armed = True
+                pre_armed_this_cycle = True
 
         # Step 2: RAKSHA-NET NTN Link Evaluation
         link_anomalies = {}
@@ -153,15 +154,19 @@ class UnifiedController:
                 self.active_route_id = "R2"
                 self.last_failover_tick = tick
                 did_failover = True
-                # Calibrated transition model: 190ms if pre-armed, 230ms if standalone
+                # Configured transition model: 190ms if pre-armed, 230ms if standalone
                 failover_ms = 190.0 if self.is_pre_armed else 230.0
                 
+                # Disarm pre-arming now that failover has been actuated
+                self.is_pre_armed = False
+                self.detector.reset_pre_arm(primary_link)
+
                 # Invoke Post-Quantum Cryptographic Handshake (NIST FIPS 203 ML-KEM-768)
                 self.sec.on_threat(t_ms=tick * 100, link_id=primary_link, anomaly=ntn_threat)
                 self.pqc_rekey_count += 1
                 status_notes.append("AUTONOMOUS_NTN_FAILOVER_TO_LEO2 + PQC_ML_KEM_768_REKEY")
 
-        if pre_armed_this_cycle and not did_failover:
+        if pre_armed_this_cycle and not did_failover and self.active_route_id == "R1":
             status_notes.append("PROACTIVE_CROSS_LAYER_PRE_ARMED (CUSUM S0=1.0)")
         if corrupted_cells > 0:
             status_notes.append(f"AICOP_GRAPHSAGE_VETOED_{corrupted_cells}_CELLS")

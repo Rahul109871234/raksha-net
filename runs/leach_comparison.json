@@ -1,0 +1,36 @@
+{
+  "leach": {
+    "protocol": "Classical LEACH (2000)",
+    "pdr_under_attack": 0.41,
+    "security_level": "None (Plaintext, 0-bit)",
+    "quantum_safe": false,
+    "spof_resilient": true,
+    "anomaly_detection": "None (Blind to Jamming)",
+    "bandwidth_saved_pct": 75.0,
+    "energy_balancing": "Probabilistic Random",
+    "operational_status": "FAILED UNDER ATTACK"
+  },
+  "raksha_baseline": {
+    "protocol": "RAKSHA-NET (Baseline)",
+    "pdr_under_attack": 0.968,
+    "security_level": "X25519+ML-KEM-768 + ChaCha20-Poly1305",
+    "quantum_safe": true,
+    "spof_resilient": false,
+    "anomaly_detection": "3-Tier (GraphSAGE + EWMA)",
+    "bandwidth_saved_pct": 0.0,
+    "energy_balancing": "None (Unbalanced drain)",
+    "operational_status": "SURVIVED (High Security, High Bandwidth)"
+  },
+  "raksha_leach_hybrid": {
+    "protocol": "RAKSHA-NET + LEACH Upgrades",
+    "pdr_under_attack": 0.964,
+    "security_level": "X25519+ML-KEM-768 + ChaCha20-Poly1305",
+    "quantum_safe": true,
+    "spof_resilient": true,
+    "anomaly_detection": "3-Tier (GraphSAGE + EWMA)",
+    "bandwidth_saved_pct": 75.0,
+    "energy_balancing": "Active (LEO1=1.00, LEO2=0.88)",
+    "session_master": "GW",
+    "operational_status": "OPTIMAL (Resilient, Energy-Balanced, Compressed)"
+  }
+}

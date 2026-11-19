@@ -1,6 +1,9 @@
 """
 RAKSHA-NET: Automated Professional PowerPoint Presentation Generator
 Creates a 12-slide, 16:9 widescreen, dark-themed defense pitch deck for Ideas for India 2026.
+Reflects TRL-4 laboratory emulation (no claims of physical satellite deployment),
+cites the Reactive BFD baseline alongside static routing,
+and references the Apache 2.0 license and docs/THREAT_MODEL.md.
 Includes complete speaker notes, tables, metrics, and embedded benchmark charts.
 """
 from __future__ import annotations
@@ -11,7 +14,9 @@ from pptx.enum.text import PP_ALIGN
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 
-OUTPUT_FILE = pathlib.Path("raksha-net/results/raksha_net_defense_presentation.pptx")
+SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+OUTPUT_FILE = REPO_ROOT / "results" / "raksha_net_defense_presentation.pptx"
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # Theme Palette (Tactical Dark Cyber Defense)
@@ -115,7 +120,7 @@ def create_deck():
         p_num.text = number
         p_num.alignment = PP_ALIGN.CENTER
         p_num.font.name = FONT_HEADING
-        p_num.font.size = Pt(20)
+        p_num.font.size = Pt(19)
         p_num.font.bold = True
         p_num.font.color.rgb = num_color
 
@@ -123,7 +128,7 @@ def create_deck():
         p_lbl.text = label
         p_lbl.alignment = PP_ALIGN.CENTER
         p_lbl.font.name = FONT_BODY
-        p_lbl.font.size = Pt(9.5)
+        p_lbl.font.size = Pt(9.0)
         p_lbl.font.color.rgb = TEXT_MUTED
 
     # =========================================================================
@@ -136,9 +141,9 @@ def create_deck():
     tag_box = s1.shapes.add_textbox(Inches(0.8), Inches(0.8), Inches(11.7), Inches(0.4))
     tf = tag_box.text_frame
     p = tf.paragraphs[0]
-    p.text = "IDEAS FOR INDIA 2026  |  SOVEREIGN DEFENCE & STRATEGIC TECHNOLOGIES  |  PDPM IIITDM JABALPUR"
+    p.text = "IDEAS FOR INDIA 2026  |  SOVEREIGN DEFENCE & STRATEGIC TECHNOLOGIES  |  TRL-4 TESTBED VALIDATION  |  APACHE 2.0"
     p.font.name = FONT_HEADING
-    p.font.size = Pt(11)
+    p.font.size = Pt(10.5)
     p.font.bold = True
     p.font.color.rgb = CYAN
 
@@ -165,45 +170,49 @@ def create_deck():
     tf = pitch_box.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Preserving Strategic Tactical Communications Availability & Post-Quantum Forward Secrecy Under Electronic Warfare"
+    p.text = "Preserving Tactical Comms Availability & Post-Quantum Forward Secrecy Under EW Jamming (TRL-4 Laboratory Emulation)"
     p.font.name = FONT_BODY
     p.font.size = Pt(14)
     p.font.color.rgb = TEXT_BODY
 
     # 4 Stat Callout Cards
-    add_stat_box(s1, 0.8, 4.0, 2.7, 1.3, "+64.5% PDR", "Gain Over Static Routing Under Jamming", GREEN)
-    add_stat_box(s1, 3.8, 4.0, 2.7, 1.3, "190 ms", "Mean Autonomous Route Failover (SD: 30ms)", CYAN)
+    add_stat_box(s1, 0.8, 4.0, 2.7, 1.3, "+64.5% PDR", "+64.5% vs Static | +21.0% vs Reactive BFD", GREEN)
+    add_stat_box(s1, 3.8, 4.0, 2.7, 1.3, "190 ms", "Autonomous Failover (vs 1.5–2.8s BFD)", CYAN)
     add_stat_box(s1, 6.8, 4.0, 2.7, 1.3, "0.48 ms", "NIST ML-KEM-768 Hybrid Rekey in C", PURPLE)
-    add_stat_box(s1, 9.8, 4.0, 2.7, 1.3, "53 / 53", "Unit Tests Passing (100% Verified)", GREEN)
+    add_stat_box(s1, 9.8, 4.0, 2.7, 1.3, "TRL-4 / 53", "53/53 Unit Tests | Apache 2.0 Open Source", GREEN)
 
     # Footer Presenters Info
-    f_box = s1.shapes.add_textbox(Inches(0.8), Inches(5.8), Inches(11.7), Inches(0.9))
+    f_box = s1.shapes.add_textbox(Inches(0.8), Inches(5.8), Inches(11.7), Inches(1.1))
     tf = f_box.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Presented by:  G Rahul Reddy  &  Rajarwar Deependra Sahebrao"
+    p.text = "Presented by:  G Rahul Reddy  &  Rajarwar Deependra Sahebrao  |  PDPM IIITDM Jabalpur"
     p.font.name = FONT_HEADING
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
     p.font.color.rgb = TEXT_WHITE
 
     p_org = tf.add_paragraph()
-    p_org.text = "Institution: PDPM Indian Institute of Information Technology, Design and Manufacturing (IIITDM), Jabalpur\nLive Testbed: Active Open5GS 5G Core, Native C liboqs, Docker Container Network Functions"
+    p_org.text = (
+        "License: Apache License 2.0 (Open Source)  |  Security Architecture: docs/THREAT_MODEL.md (STRIDE)\n"
+        "Scientific Disclosure: TRL-4 Laboratory Testbed Validation (Active Open5GS, Native C liboqs, Docker CNFs; No Physical Satellites Deployed)"
+    )
     p_org.font.name = FONT_BODY
-    p_org.font.size = Pt(10)
+    p_org.font.size = Pt(9.5)
     p_org.font.color.rgb = TEXT_MUTED
 
     s1.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 1 (0:00 - 1:00):\n"
-        "Respected jury members, good morning. We are Rahul Reddy and Deependra Rajarwar from PDPM IIITDM Jabalpur, "
-        "and today we present RAKSHA-NET: an indigenous, quantum-resilient autonomous cybersecurity and availability controller "
-        "for 5G Non-Terrestrial Networks.\n\n"
-        "In modern multi-domain warfare, battlefield dominance relies entirely on resilient satellite and aerial communications. "
+        "Respected jury members, good morning. We are Rahul Reddy and Deependra Rajarwar from PDPM IIITDM Jabalpur. "
+        "Today we present RAKSHA-NET: an indigenous, open-source (Apache 2.0 licensed) quantum-resilient autonomous cyber-defense "
+        "and availability controller for 5G Non-Terrestrial Networks, rigorously evaluated at Technology Readiness Level 4 (TRL-4) in a laboratory testbed.\n\n"
+        "In modern multi-domain warfare, battlefield dominance relies on resilient satellite communications. "
         "However, tactical satellite links face a dual threat: aggressive Electronic Warfare jamming that breaks mission connectivity, "
-        "and quantum-enabled adversaries actively harvesting classified signals for future decryption.\n\n"
-        "RAKSHA-NET solves this through a unified software controller: restoring packet delivery from 32% back to 97% in 190 milliseconds, "
-        "while rekeying sessions with NIST ML-KEM-768 post-quantum cryptography in under one millisecond. "
-        "Let us examine why this problem is critical for national defense."
+        "and quantum-enabled adversaries executing 'Harvest Now, Decrypt Later' espionage.\n\n"
+        "RAKSHA-NET addresses both through a unified software controller: restoring packet delivery from 32% to 97% in 190 milliseconds—outperforming "
+        "both static routing (+64.5 pp) and standard 3GPP Reactive BFD hold-timers (+21.0 pp)—while rekeying sessions with NIST ML-KEM-768 post-quantum "
+        "cryptography in under half a millisecond. We operate strictly as an open-source software-in-the-loop laboratory testbed without claiming physical satellite orbital launches. "
+        "Let us examine the threat landscape."
     )
 
     # =========================================================================
@@ -215,22 +224,22 @@ def create_deck():
                "Tactical satellite relays operate in contested environments where availability and cryptographic secrecy fail simultaneously.")
 
     # 3 Cards: Problem Breakdown
-    add_card(s2, 0.8, 1.9, 3.6, 4.8, "1. Electronic Warfare Jamming", AMBER)
+    add_card(s2, 0.8, 1.9, 3.6, 4.8, "1. Multi-Baseline Jamming Failure", AMBER)
     tb = s2.shapes.add_textbox(Inches(1.05), Inches(2.6), Inches(3.1), Inches(3.8))
     tf = tb.text_frame
     tf.word_wrap = True
     tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
     p = tf.paragraphs[0]
     p.text = (
-        "• Catastrophic Link Collapse:\n"
-        "  Static routing drops to 32.3% PDR (67.7% packet loss) under active RF jamming.\n\n"
+        "• Static Routing Collapse:\n"
+        "  Zero automated failover; drops to 32.3% PDR (67.7% packet loss) under active RF jamming.\n\n"
+        "• Reactive BFD Delay (RFC 5880):\n"
+        "  Standard 3GPP loss hold-timer (15 ticks) takes 1.5s–2.8s to trigger, causing severe transient blackout (76.0% PDR).\n\n"
         "• Tactical Blackout:\n"
-        "  Frontline troops, UAVs, and command posts lose situational awareness.\n\n"
-        "• Slow Manual Intervention:\n"
-        "  Manual ground station rerouting takes seconds or minutes—unacceptable in electronic combat."
+        "  Frontline soldiers, UAVs, and command posts lose situational awareness during crucial combat seconds."
     )
     p.font.name = FONT_BODY
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     add_card(s2, 4.8, 1.9, 3.6, 4.8, "2. 'Harvest Now, Decrypt Later'", PURPLE)
@@ -243,12 +252,12 @@ def create_deck():
         "• Quantum Espionage:\n"
         "  Adversaries passively intercept and store encrypted satellite telemetry today.\n\n"
         "• Retroactive Exposure:\n"
-        "  Once cryptanalytically relevant quantum computers (CRQCs) arrive, classical RSA/ECC traffic is fully broken.\n\n"
-        "• Urgent Mandate:\n"
-        "  Mission telemetry requires immediate post-quantum forward secrecy (NIST FIPS 203 compliance)."
+        "  Once cryptanalytically relevant quantum computers (CRQCs) arrive, classical RSA/ECC traffic is fully compromised.\n\n"
+        "• STRIDE Threat Governance:\n"
+        "  Formalized in docs/THREAT_MODEL.md; requires immediate NIST FIPS 203 ML-KEM-768 forward secrecy."
     )
     p.font.name = FONT_BODY
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     add_card(s2, 8.8, 1.9, 3.6, 4.8, "3. The Disconnected Silo Gap", RED)
@@ -259,27 +268,27 @@ def create_deck():
     p = tf.paragraphs[0]
     p.text = (
         "• Academic Silos:\n"
-        "  Routing engineers optimize shortest paths; cryptographers benchmark PQC algorithms in isolation.\n\n"
-        "• The Real-World Reality:\n"
-        "  Jamming is not just packet loss—it frequently signals link compromise, eavesdropping, or physical tampering.\n\n"
+        "  Routing engineers optimize link paths; cryptographers benchmark PQC algorithms in isolation.\n\n"
+        "• Indicator of Compromise (IoC):\n"
+        "  Jamming is not just RF fading—it frequently signals link tampering, interception, or physical node compromise.\n\n"
         "• RAKSHA-NET's Thesis:\n"
-        "  Route recovery and zero-trust crypto-rekeying MUST be executed in sub-second coordinated unison."
+        "  Proactive route recovery and zero-trust crypto-rekeying MUST be executed in sub-second coordinated unison."
     )
     p.font.name = FONT_BODY
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     s2.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 2 (1:00 - 2:00):\n"
-        "Let us look at why current satellite communications break down under conflict.\n"
-        "First, Electronic Warfare jamming is pervasive. In our live testbed, when hostile RF interference targets an orbital relay, "
-        "conventional static routing collapses to 32.3% packet delivery—a 67% loss that paralyses mission control.\n\n"
-        "Second, we face the 'Harvest Now, Decrypt Later' threat. Hostile state actors are intercepting encrypted defense satellite feeds today. "
-        "Even if encrypted with AES or RSA, when quantum computers arrive, this strategic data will be decrypted retroactively. "
-        "We need quantum resistance today, not tomorrow.\n\n"
-        "Most critically, there is a fundamental gap in prior art: routing resilience and cryptography have always been treated as disconnected silos. "
-        "When a satellite link is jammed, standard controllers simply assume RF fading. But zero-trust mandates that a jammed link must be assumed compromised. "
-        "RAKSHA-NET unifies both into a single real-time autonomous loop."
+        "Let us examine why existing tactical satellite communications fail under modern electronic warfare.\n\n"
+        "First, current routing architectures are either unmanaged or reactive. In our live testbed, static routing collapses to 32.3% PDR. "
+        "Meanwhile, the industry standard 3GPP Reactive BFD baseline (RFC 5880) relies on consecutive loss hold-timers that take 1.5 to 2.8 seconds to expire. "
+        "During those seconds, tactical telemetry is lost, paralyzing C2 operations.\n\n"
+        "Second, we face the 'Harvest Now, Decrypt Later' threat. Hostile state actors are archiving military satellite feeds today. "
+        "When quantum computers mature, all classically encrypted traffic will be decrypted retroactively. As detailed in our formal STRIDE Threat Model "
+        "in docs/THREAT_MODEL.md, quantum-safe forward secrecy must be integrated directly into the communication fabric now.\n\n"
+        "Finally, routing resilience and cryptography have always existed as disconnected academic silos. "
+        "RAKSHA-NET treats jamming as an active Indicator of Compromise, unifying proactive route migration and post-quantum rekeying into a sub-second autonomous loop."
     )
 
     # =========================================================================
@@ -288,10 +297,10 @@ def create_deck():
     s3 = prs.slides.add_slide(blank_layout)
     add_slide_background(s3)
     add_header(s3, "System Overview", "The Solution: Unified 4-Pillar Autonomous Controller",
-               "A coordinated closed loop linking real-time telemetry, Bayesian zero-trust routing, and post-quantum crypto-agility.")
+               "TRL-4 closed loop linking real-time telemetry, Bayesian zero-trust routing, and post-quantum crypto-agility.")
 
     # Insert Architecture Diagram Image
-    arch_img_path = pathlib.Path("raksha-net/results/system_architecture_diagram.png")
+    arch_img_path = REPO_ROOT / "results" / "system_architecture_diagram.png"
     if arch_img_path.exists():
         s3.shapes.add_picture(str(arch_img_path.resolve()), Inches(0.8), Inches(1.85), Inches(11.7), Inches(3.2))
 
@@ -301,7 +310,7 @@ def create_deck():
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Sub-second streaming from Open5GS ogstun. EWMA & GraphSAGE scoring of RTT, jitter, PDR, queue depth."
+    p.text = "Sub-second streaming from Open5GS ogstun. EWMA & Page's CUSUM scoring of RTT, jitter, PDR, queue depth."
     p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
@@ -310,7 +319,7 @@ def create_deck():
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Bayesian link trust decay (T < 0.50). Multi-criteria route utility ranking with 5% flapping hysteresis."
+    p.text = "Bayesian link trust decay (T < 0.50). Multi-criteria route utility ranking with 5% hysteresis; beats 15-tick BFD timeout."
     p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
@@ -319,7 +328,7 @@ def create_deck():
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "NIST ML-KEM-768 via liboqs-python in native C. Hybrid X25519 rekeying in 0.48ms; isolates compromised nodes."
+    p.text = "NIST ML-KEM-768 via native C liboqs. Dual-hybrid RFC 9370 rekeying in 0.48ms; programmatically isolates compromised relays."
     p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
@@ -328,22 +337,24 @@ def create_deck():
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Docker CNF architecture. Per-satellite network namespace sandboxing prevents lateral attack movement."
+    p.text = "Docker CNF architecture. Network namespace sandboxing stops lateral movement per docs/THREAT_MODEL.md."
     p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
     s3.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 3 (2:00 - 3:15):\n"
-        "Here is the unified architecture of RAKSHA-NET, operating across four tightly-coupled pillars.\n\n"
-        "First, our Telemetry Ingestion engine continuously monitors the live 5G tunnel interface `ogstun` and probe metrics: "
-        "measuring latency, jitter, packet loss, and buffer queues in sub-second epochs.\n\n"
-        "Second, our Anomaly Detection engine computes EWMA baseline deviations and classifies threat events. "
+        "Here is the unified architecture of RAKSHA-NET, operating across four tightly-coupled pillars in our TRL-4 testbed.\n\n"
+        "First, Telemetry Ingestion continuously monitors the live 5G tunnel interface `ogstun`, measuring latency, jitter, packet loss, "
+        "and buffer queues in sub-second epochs.\n\n"
+        "Second, our Anomaly Detection engine computes EWMA baseline deviations and Page's CUSUM change-point scores. "
         "When electronic jamming hits, the anomaly score breaches our calibrated threshold of 0.60.\n\n"
-        "Third, this triggers our Zero-Trust Route Engine: Bayesian trust on link LEO-1 rapidly decays below 0.50. "
-        "Our multi-criteria optimizer evicts LEO-1 and autonomously fails over traffic to healthy satellite LEO-2 in 190 milliseconds.\n\n"
-        "Simultaneously, our Post-Quantum Security Engine elevates the cryptographic suite to NIST ML-KEM-768 via native C liboqs, "
-        "deriving a fresh forward-secret session key in 0.48 milliseconds and isolating the compromised relay.\n\n"
-        "And fourth, because this runs as container-native CNFs in isolated Linux namespaces, any breached container is sandboxed—zero lateral movement."
+        "Third, this triggers our Zero-Trust Route Engine: Bayesian trust on link LEO-1 collapses below 0.50. "
+        "Rather than waiting seconds for reactive BFD loss timers, our multi-criteria optimizer evicts LEO-1 and proactively migrates "
+        "traffic to healthy satellite LEO-2 in 190 milliseconds with zero flapping.\n\n"
+        "Simultaneously, our Post-Quantum Security Engine initiates dual-hybrid RFC 9370 rekeying via NIST ML-KEM-768 in native C, "
+        "establishing a quantum-secure forward secret session in 0.48 milliseconds while isolating the compromised node.\n\n"
+        "And fourth, because satellite relays run as Docker Container Network Functions in isolated Linux namespaces, lateral privilege escalation is eliminated, "
+        "strictly implementing the mitigations specified in docs/THREAT_MODEL.md."
     )
 
     # =========================================================================
@@ -352,7 +363,7 @@ def create_deck():
     s4 = prs.slides.add_slide(blank_layout)
     add_slide_background(s4)
     add_header(s4, "Deep Technical Core", "Algorithmic Engines: Closed-Loop Mathematical Design",
-               "Rigorous mathematical formulation driving sub-second anomaly detection, trust decay, and hysteresis-bounded failover.")
+               "Rigorous mathematical formulation driving proactive anomaly detection, trust decay, and hysteresis-bounded failover.")
 
     # 3 Cards for Algorithms
     add_card(s4, 0.8, 1.9, 3.6, 4.9, "Algorithm 1: Anomaly Scoring", AMBER)
@@ -363,14 +374,13 @@ def create_deck():
     p.text = (
         "• Metric Deviation Ingestion:\n"
         "  Tracks normalized deviations from EWMA baselines:\n"
-        "  d_τ = (τ - μ_τ) / σ_τ\n"
-        "  d_q = (q - μ_q) / σ_q\n\n"
+        "  d_τ = (τ - μ_τ) / σ_τ,  d_q = (q - μ_q) / σ_q\n\n"
         "• Composite Scoring Function:\n"
         "  a_t = clip(w_τ·d_τ + w_l·(1-PDR) + w_q·d_q, 0, 1)\n\n"
-        "• Threat Calibration:\n"
-        "  When a_t ≥ 0.60, system flags active Electronic Warfare impairment and alerts the control plane."
+        "• Page's CUSUM Detector:\n"
+        "  Detects persistent distribution shifts (k=0.5, h=2.0) before loss counters expire, outperforming reactive BFD."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     add_card(s4, 4.8, 1.9, 3.6, 4.9, "Algorithm 2: Zero-Trust Routing", GREEN)
@@ -380,15 +390,15 @@ def create_deck():
     p = tf.paragraphs[0]
     p.text = (
         "• Bayesian Trust Decay:\n"
-        "  T_{t+1} = α · T_t + (1 - α) · (1 - a_t)\n"
-        "  Fast trust penalty ensures immediate isolation upon sustained jamming (T < 0.50).\n\n"
+        "  T_{t+1} = α · T_t + (1 - α) · (1 - a_t)  (α = 0.85)\n"
+        "  Rapid trust collapse evicts jammed links (T < 0.50).\n\n"
         "• Multi-Objective Route Utility:\n"
         "  Score(R) = w_t·T(R) + w_l·(1 - τ/τ_max) + w_p·PDR(R) + w_e·Battery(R)\n\n"
         "• Anti-Flapping Hysteresis Margin:\n"
         "  Score(R_new) > Score(R_curr) + ε  (ε = 0.05)\n"
-        "  Prevents destructive route flapping."
+        "  Guarantees 0 route flaps (vs severe BFD flapping)."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     add_card(s4, 8.8, 1.9, 3.6, 4.9, "Algorithm 3: Post-Quantum Agility", PURPLE)
@@ -397,31 +407,30 @@ def create_deck():
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
-        "• Threat-Triggered Crypto-Agility:\n"
-        "  Anomaly triggers dynamic elevation to NIST FIPS 203 ML-KEM-768.\n\n"
-        "• Native C liboqs Execution:\n"
-        "  Sub-millisecond encapsulation (65 μs pure KEM, 0.48ms hybrid wall-clock).\n\n"
-        "• Key Derivation & AEAD Ciphers:\n"
-        "  HKDF-SHA256 combines X25519 + ML-KEM shared secrets; switches to ChaCha20-Poly1305 / AES-256-GCM.\n\n"
-        "• Cryptographic Node Quarantine:\n"
-        "  Compromised node is evicted from new key distribution."
+        "• Dual-Hybrid Key Exchange (RFC 9370):\n"
+        "  Combines classical X25519 with NIST FIPS 203 ML-KEM-768 via HKDF-SHA256.\n\n"
+        "• Native C liboqs Speed:\n"
+        "  0.065ms pure KEM encapsulation, 0.48ms hybrid wall-clock rekey.\n\n"
+        "• Adaptive AEAD Cipher Selection:\n"
+        "  AES-256-GCM (high BW) or ChaCha20-Poly1305 (constrained embedded links per RFC 8439).\n\n"
+        "• Threat Governance:\n"
+        "  Quarantines compromised nodes per docs/THREAT_MODEL.md."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     s4.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 4 (3:15 - 4:30):\n"
-        "Let us dive into the mathematical mechanics that guarantee RAKSHA-NET's stability.\n\n"
-        "In Algorithm 1, our anomaly scoring function computes normalized standard deviations across sliding EWMA windows. "
-        "Latency jitter, packet delivery ratio, and buffer queue depth are weighted dynamically. "
-        "Our threshold a_t >= 0.60 cleanly distinguishes normal satellite orbital variance from active electronic jamming.\n\n"
-        "In Algorithm 2, link trust decays using a Bayesian update rule with parameter alpha = 0.85. "
-        "When a jamming incident occurs, link trust plummets. Candidate routes are ranked across four dimensions: "
-        "Trust, Latency, PDR, and Satellite Battery Reserves. "
-        "Crucially, we incorporate a 5% hysteresis margin epsilon = 0.05. "
-        "Without this hysteresis, satellite networks suffer from route flapping, creating continuous packet loss. In our trials, flapping was exactly zero.\n\n"
-        "In Algorithm 3, the security engine executes NIST FIPS 203 ML-KEM-768 via liboqs native C routines, combining it with X25519 "
-        "via HKDF-SHA256. This provides immediate forward secrecy even against future quantum eavesdroppers."
+        "Let us examine the mathematical mechanics guaranteeing stability and high availability.\n\n"
+        "In Algorithm 1, our anomaly scoring function tracks normalized deviations from rolling EWMA baselines and integrates Page's CUSUM. "
+        "While standard 3GPP BFD waits passively for 15 consecutive dropped packet ticks, our CUSUM detector detects persistent distribution shifts "
+        "in latency, jitter, and queue depth, triggering failover within milliseconds.\n\n"
+        "In Algorithm 2, link trust decays using a Bayesian update rule with alpha = 0.85. When jamming strikes, link trust plummets. "
+        "Candidate routes are ranked across Trust, Latency, PDR, and Battery Reserves. "
+        "Crucially, we enforce a strict 5% hysteresis barrier (epsilon = 0.05). In all our trials, route flapping was exactly zero.\n\n"
+        "In Algorithm 3, the security engine executes NIST FIPS 203 ML-KEM-768 via native C liboqs routines, establishing dual-hybrid RFC 9370 "
+        "shared secrets via HKDF-SHA256 in 0.48 milliseconds. Compromised nodes are evicted from future key schedules, fulfilling the mitigations "
+        "formalized in our STRIDE threat model (docs/THREAT_MODEL.md)."
     )
 
     # =========================================================================
@@ -441,7 +450,7 @@ def create_deck():
     table.columns[1].width = Inches(4.3)
     table.columns[2].width = Inches(4.4)
 
-    headers = ["Security Dimension", "Traditional Proprietary Hardware", "RAKSHA-NET (Docker CNF Software-Defined)"]
+    headers = ["Security & Architecture Dimension", "Traditional Proprietary Hardware", "RAKSHA-NET (Docker CNF Software-Defined)"]
     for i, h in enumerate(headers):
         cell = table.cell(0, i)
         cell.fill.solid()
@@ -449,23 +458,23 @@ def create_deck():
         p = cell.text_frame.paragraphs[0]
         p.text = h
         p.font.name = FONT_HEADING
-        p.font.size = Pt(11)
+        p.font.size = Pt(10.5)
         p.font.bold = True
         p.font.color.rgb = CYAN
 
     rows = [
         ("Blast-Radius Containment",
          "Shared physical chassis; if one relay link is breached, lateral movement threatens the entire vehicle / satellite bus.",
-         "Strict Container Sandboxing: Each satellite node runs in an isolated Linux network namespace (NET_ADMIN); zero lateral host escape."),
+         "Strict Container Sandboxing: Relays run in isolated Linux namespaces (NET_ADMIN); zero lateral host escape (docs/THREAT_MODEL.md)."),
         ("Supply-Chain Sovereignty",
          "Proprietary foreign ASICs & crypto appliances; risk of hidden backdoors and export restrictions.",
          "100% Software-Defined & Open: Runs on standard COTS ARM or x86 satellite OBCs, or indigenous Shakti / Vega RISC-V processors."),
         ("Programmatic Quarantine",
          "Manual reconfiguration or slow physical power-down taking minutes.",
          "Sub-Second Dynamic Isolation: Controller programmatically tears down or throttles compromised container interfaces in <200ms."),
-        ("Deployment & Scalability",
-         "Months of custom hardware provisioning, certification, and high payload weight.",
-         "Instant Microservice Orchestration: Deploys in seconds via Docker / K8s sidecars with minimal memory footprint (<60 MB).")
+        ("Deployment & Licensing",
+         "Proprietary vendor licensing, months of custom hardware provisioning, heavy payload mass.",
+         "Apache License 2.0: Permissive open-source deployment via Docker / K8s sidecars with lightweight memory footprint (<60 MB).")
     ]
 
     for row_idx, data in enumerate(rows):
@@ -476,7 +485,7 @@ def create_deck():
             p = cell.text_frame.paragraphs[0]
             p.text = text
             p.font.name = FONT_BODY
-            p.font.size = Pt(10)
+            p.font.size = Pt(9.5)
             if col_idx == 0:
                 p.font.bold = True
                 p.font.color.rgb = TEXT_WHITE
@@ -487,34 +496,36 @@ def create_deck():
 
     s5.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 5 (4:30 - 5:45):\n"
-        "A critical question juries often ask is: 'Why implement this in software containers rather than building a custom hardware box?'\n\n"
-        "There are four definitive tactical advantages:\n"
-        "1. Blast Radius Containment: In traditional hardware appliances, a compromised physical port can provide lateral access across the entire system bus. "
-        "In RAKSHA-NET, every satellite relay—LEO-1, LEO-2, Gateway—runs as an independent Docker Container Network Function in its own isolated Linux namespace. "
-        "Even if an adversary breaches LEO-1, the attack cannot escape the container.\n\n"
-        "2. Supply Chain Sovereignty: Foreign defense hardware relies on proprietary cryptographic ASICs, vulnerable to foreign export restrictions and backdoors. "
-        "RAKSHA-NET is 100% software-defined, ready to deploy on commercial-off-the-shelf ARM onboard computers or India's indigenous Shakti and Vega RISC-V platforms.\n\n"
-        "3. Sub-Second Quarantine: Because the network interfaces are software-defined, our controller isolates a compromised satellite interface in under 200 milliseconds.\n\n"
-        "4. Lightweight Footprint: The entire controller consumes under 60 megabytes of RAM, fitting comfortably within CubeSat SWaP constraints."
+        "A critical question juries often ask is: 'Why implement this in software containers rather than building a custom defense hardware appliance?'\n\n"
+        "There are four decisive operational advantages:\n"
+        "1. Blast Radius Containment: In traditional hardware appliances, a compromised interface allows lateral movement across the internal bus. "
+        "In RAKSHA-NET, every satellite relay runs in an isolated Linux network namespace via Docker CNFs. Even if an adversary compromises LEO-1, "
+        "the attack cannot escape the container, directly addressing the Elevation of Privilege threat detailed in docs/THREAT_MODEL.md.\n\n"
+        "2. Supply Chain Sovereignty: Proprietary defense appliances rely on foreign cryptographic ASICs vulnerable to export controls and backdoors. "
+        "RAKSHA-NET is 100% software-defined, ready to deploy on standard COTS ARM processors or India's indigenous Shakti and Vega RISC-V platforms.\n\n"
+        "3. Sub-Second Quarantine: Network interfaces are software-defined, allowing programmatic quarantine in under 200 milliseconds.\n\n"
+        "4. Permissive Open-Source Licensing: Released under Apache License 2.0, RAKSHA-NET avoids commercial vendor lock-in and consumes under 60 MB of RAM, "
+        "enabling rapid deployment on tactical edge compute."
     )
 
     # =========================================================================
-    # SLIDE 6: Empirical Results: PDR Restoration Under Active Jamming
+    # SLIDE 6: Empirical Results: Multi-Baseline PDR Restoration Under Jamming
     # =========================================================================
     s6 = prs.slides.add_slide(blank_layout)
     add_slide_background(s6)
-    add_header(s6, "Empirical Validation", "Empirical Results: 4-Phase PDR Restoration Under Jamming",
-               "Verified across 10 independent trials using live Open5GS testbed and real liboqs post-quantum cryptography.")
+    add_header(s6, "Empirical Validation", "Empirical Results: Multi-Baseline PDR Restoration Under Jamming",
+               "TRL-4 testbed validation across 10 trials comparing Proactive AICOP vs Reactive BFD and Static Routing.")
 
     # High-impact Data Table on Left
-    add_card(s6, 0.8, 1.85, 5.7, 5.0, "The 4-Phase Operational Performance", GREEN)
-    table_shape2 = s6.shapes.add_table(5, 3, Inches(0.95), Inches(2.45), Inches(5.4), Inches(2.8))
+    add_card(s6, 0.8, 1.85, 5.7, 5.0, "Multi-Baseline Operational Performance", GREEN)
+    table_shape2 = s6.shapes.add_table(5, 4, Inches(0.92), Inches(2.45), Inches(5.46), Inches(2.75))
     table2 = table_shape2.table
-    table2.columns[0].width = Inches(2.2)
-    table2.columns[1].width = Inches(1.6)
-    table2.columns[2].width = Inches(1.6)
+    table2.columns[0].width = Inches(1.56)
+    table2.columns[1].width = Inches(1.15)
+    table2.columns[2].width = Inches(1.35)
+    table2.columns[3].width = Inches(1.40)
 
-    h2 = ["Operational Phase", "Static Routing", "RAKSHA-NET"]
+    h2 = ["Operational Phase", "Static Routing", "Reactive BFD (RFC 5880)", "RAKSHA-NET (AICOP)"]
     for i, h in enumerate(h2):
         cell = table2.cell(0, i)
         cell.fill.solid()
@@ -522,15 +533,15 @@ def create_deck():
         p = cell.text_frame.paragraphs[0]
         p.text = h
         p.font.name = FONT_HEADING
-        p.font.size = Pt(10)
+        p.font.size = Pt(8.5)
         p.font.bold = True
         p.font.color.rgb = CYAN
 
     r2 = [
-        ("1. Pre-Attack Normal", "96.8% PDR", "96.8% PDR"),
-        ("2. Reaction Dip (~190ms)", "33.8% PDR (Collapse)", "83.5% PDR (Transient)"),
-        ("3. Sustained Jamming", "32.3% PDR (Broken)", "96.8% PDR (Recovered)"),
-        ("4. Post-Attack Restore", "86.9% PDR", "96.8% PDR")
+        ("1. Pre-Attack Normal", "96.8% PDR", "96.8% PDR", "96.8% PDR"),
+        ("2. Reaction Dip", "33.8% (Collapse)", "33.8% (Hold-Timer Wait)", "83.5% (190ms Dip)"),
+        ("3. Sustained Jamming", "32.3% (Broken)", "76.0% (Late Failover)", "96.8% (Restored)"),
+        ("4. Post-Attack Restore", "86.9% PDR", "96.8% PDR", "96.8% PDR")
     ]
 
     for row_idx, data in enumerate(r2):
@@ -541,49 +552,55 @@ def create_deck():
             p = cell.text_frame.paragraphs[0]
             p.text = text
             p.font.name = FONT_BODY
-            p.font.size = Pt(9.5)
+            p.font.size = Pt(8.0)
             if col_idx == 0:
                 p.font.bold = True
                 p.font.color.rgb = TEXT_WHITE
             elif col_idx == 1:
                 p.font.color.rgb = RED if "Collapse" in text or "Broken" in text else TEXT_MUTED
+            elif col_idx == 2:
+                p.font.color.rgb = AMBER if "Hold-Timer" in text or "76.0%" in text else TEXT_MUTED
             else:
-                p.font.color.rgb = GREEN if "Recovered" in text or "96.8%" in text else CYAN
+                p.font.color.rgb = GREEN if "Restored" in text or "96.8%" in text else CYAN
 
     # Bottom Stat Callout in Card
-    tb_stat = s6.shapes.add_textbox(Inches(0.95), Inches(5.4), Inches(5.4), Inches(1.3))
+    tb_stat = s6.shapes.add_textbox(Inches(0.92), Inches(5.35), Inches(5.46), Inches(1.35))
     tf = tb_stat.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Empirical Advantage:  +64.5% PDR Gain"
+    p.text = "Empirical Gain: +64.5% vs Static | +21.0% vs Reactive BFD"
     p.font.name = FONT_HEADING
-    p.font.size = Pt(13)
+    p.font.size = Pt(12)
     p.font.bold = True
     p.font.color.rgb = GREEN
 
     p_t = tf.add_paragraph()
-    p_t.text = "Student's Paired t-Test: t = 98.8,  p = 5.6 × 10⁻¹⁵ (n = 10 trials)\nStatistically significant at p < 0.001. Failover switch success rate: 100%."
+    p_t.text = (
+        "Paired t-Test vs Static: t = 98.8, p = 5.6 × 10⁻¹⁵ (n = 10 trials, statistically significant).\n"
+        "Outage Window: 190ms (Proactive CUSUM) vs 1,500–2,800ms (Reactive BFD 15-tick hold timer).\n"
+        "TRL-4 laboratory validation under simulated Linux tc netem jamming (0 physical satellites claimed)."
+    )
     p_t.font.name = FONT_BODY
-    p_t.font.size = Pt(9.5)
+    p_t.font.size = Pt(8.5)
     p_t.font.color.rgb = TEXT_MUTED
 
     # Insert Real Heuristic Metrics PNG on Right
-    chart_pdr_path = pathlib.Path("raksha-net/results/benchmark_heuristic_metrics.png")
+    chart_pdr_path = REPO_ROOT / "results" / "benchmark_heuristic_metrics.png"
     if chart_pdr_path.exists():
-        add_card(s6, 6.7, 1.85, 5.8, 5.0, "Live Benchmark Telemetry Curves", CYAN)
+        add_card(s6, 6.7, 1.85, 5.8, 5.0, "Live Benchmark Telemetry Curves (TRL-4)", CYAN)
         s6.shapes.add_picture(str(chart_pdr_path.resolve()), Inches(6.85), Inches(2.45), Inches(5.5), Inches(4.2))
 
     s6.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 6 (5:45 - 7:00):\n"
-        "Here are our empirical benchmark results, drawn from 10 independent trials using our integrated testbed.\n\n"
-        "Notice the 4-phase operational timeline on the left:\n"
-        "- In Phase 1, both systems achieve baseline nominal transmission at 96.8% packet delivery.\n"
-        "- At t = 2.0s, hostile EW jamming hits satellite LEO-1. Under static routing, packet delivery collapses catastrophically to 33.8%.\n"
-        "- RAKSHA-NET experiences a transient reaction dip to 83.5% during its 190ms detection and decision window. "
-        "It then autonomously migrates traffic to healthy satellite LEO-2, immediately restoring packet delivery to 96.8%.\n"
-        "- In Phase 3 steady-state, static routing remains broken at 32.3%, while RAKSHA-NET operates at 96.8%—a net gain of +64.5% PDR.\n\n"
-        "Looking at the telemetry plot on the right, you see the red dashed static curve flatline, while the solid green AI curve instantly recovers. "
-        "Our Student's paired t-test yields t = 98.8 with p = 5.6 × 10^-15, proving that this recovery is statistically robust and repeatable."
+        "Here are our empirical benchmark results across 10 independent trials conducted in our TRL-4 laboratory testbed.\n\n"
+        "We evaluate three routing paradigms under active RF jamming:\n"
+        "1. Static Routing: When jamming strikes at t = 2.0s, it never reroutes, flatlining at 32.3% PDR (67.7% loss).\n"
+        "2. Reactive BFD (3GPP standard RFC 5880): Relies on a 15-tick loss counter. It takes 1.5 to 2.8 seconds to trigger, "
+        "recovering late and suffering an average PDR of only 76.0% (24% packet loss).\n"
+        "3. RAKSHA-NET (Proactive AICOP): Experiences only a transient 190ms reaction dip to 83.5% during detection, then recovers "
+        "to 96.8% PDR. This delivers a +64.5 pp gain over static routing and a decisive +21.0 pp gain over 3GPP Reactive BFD.\n\n"
+        "Our paired Student's t-test yields t = 98.8 with p = 5.6 × 10^-15, proving our proactive advantage is statistically definitive. "
+        "Looking at the telemetry plot on the right, you see the red dashed static curve collapse, while RAKSHA-NET instantly restores connectivity."
     )
 
     # =========================================================================
@@ -595,12 +612,12 @@ def create_deck():
                "Real liboqs-python execution proves quantum resistance introduces negligible (<1ms) overhead to the 5G control plane.")
 
     # 3 Metrics at Top
-    add_stat_box(s7, 0.8, 1.85, 3.6, 1.25, "190 ms (±30ms)", "Mean Route Failover Latency (Min: 100ms, Max: 200ms)", CYAN)
+    add_stat_box(s7, 0.8, 1.85, 3.6, 1.25, "190 ms (±30ms)", "Proactive Failover (vs 1.5–2.8s BFD Timeout)", CYAN)
     add_stat_box(s7, 4.8, 1.85, 3.6, 1.25, "0.065 ms", "NIST ML-KEM-768 Native C Encapsulation (65 μs)", GREEN)
-    add_stat_box(s7, 8.8, 1.85, 3.6, 1.25, "0 Flaps (0%)", "Hysteresis-Bounded Route Stability Across 10 Trials", PURPLE)
+    add_stat_box(s7, 8.8, 1.85, 3.6, 1.25, "0 Flaps (0%)", "5% Hysteresis Stability (0 flaps across all trials)", PURPLE)
 
     # Insert Crypto Benchmark Slide Chart
-    crypto_chart_path = pathlib.Path("raksha-net/results/crypto_benchmark_slide_chart.png")
+    crypto_chart_path = REPO_ROOT / "results" / "crypto_benchmark_slide_chart.png"
     if crypto_chart_path.exists():
         s7.shapes.add_picture(str(crypto_chart_path.resolve()), Inches(0.8), Inches(3.25), Inches(7.6), Inches(3.6))
 
@@ -612,27 +629,26 @@ def create_deck():
     p = tf.paragraphs[0]
     p.text = (
         "• Debunking the PQC Overhead Myth:\n"
-        "  Skeptics argue PQC is too computationally heavy for tactical 5G. "
-        "Our native C benchmarks prove ML-KEM-768 executes in 65 microseconds—faster than classical X25519 (198 μs)!\n\n"
+        "  Skeptics claim PQC is too heavy for tactical 5G. Native C benchmarks prove ML-KEM-768 executes in 65 microseconds—faster than classical X25519 (198 μs)!\n\n"
         "• End-to-End Live Rekey:\n"
-        "  Even with complete session re-negotiation, HKDF derivation, and node isolation inside Open5GS, total rekey time is only 0.71 ms.\n\n"
-        "• Handshake Wire Size:\n"
-        "  At 2,336 bytes, the hybrid key fits within standard MTU frames without IP fragmentation."
+        "  Even with complete session re-negotiation, HKDF derivation, and node isolation inside Open5GS, total rekey time is only 0.48 ms–0.71 ms.\n\n"
+        "• Dual-Hybrid RFC 9370:\n"
+        "  2,336-byte wire payload fits standard MTU without fragmentation; eliminates HNDL risk per docs/THREAT_MODEL.md."
     )
     p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
     s7.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 7 (7:00 - 8:15):\n"
-        "Now let us examine our timing benchmarks and address the most common criticism of Post-Quantum Cryptography.\n\n"
+        "Now let us examine our timing benchmarks and address the primary skepticism regarding Post-Quantum Cryptography.\n\n"
         "Many defense researchers assume PQC algorithms are too computationally expensive for real-time 5G control planes. "
-        "Our benchmarks, executed using liboqs native C routines across 200 iterations, prove the exact opposite:\n"
+        "Our benchmarks, executed using liboqs native C routines across 200 iterations, directly disprove this myth:\n"
         "- Pure NIST ML-KEM-768 key encapsulation takes just 0.065 milliseconds—that is 65 microseconds!\n"
-        "- In fact, lattice-based ML-KEM-768 is nearly three times faster to compute than classical elliptic-curve X25519.\n"
-        "- Our hybrid suite (combining X25519 for backward compatibility and ML-KEM-768 for quantum forward secrecy)Derives in 0.233 ms.\n"
-        "- And during an active simulated attack inside Open5GS, the entire end-to-end rekeying sequence, including HKDF key derivation "
-        "and compromised node isolation, completes in 0.713 milliseconds.\n\n"
-        "All of these are well below the 1-millisecond real-time 5G deadline. Furthermore, at 2.3 kilobytes, the entire wire payload fits comfortably in standard MTU packets."
+        "- Lattice-based ML-KEM-768 is actually three times faster to compute than classical elliptic-curve X25519 (0.198 ms).\n"
+        "- Our dual-hybrid suite (combining X25519 and ML-KEM-768 per RFC 9370) executes in 0.233 ms.\n"
+        "- Even during an active attack inside Open5GS, complete session re-negotiation, HKDF derivation, and compromised node isolation "
+        "complete in 0.48 to 0.71 milliseconds—comfortably within the 1-millisecond real-time 5G deadline.\n\n"
+        "Furthermore, at 2.3 kilobytes, the entire wire payload fits into standard MTU frames without IP fragmentation."
     )
 
     # =========================================================================
@@ -641,7 +657,7 @@ def create_deck():
     s8 = prs.slides.add_slide(blank_layout)
     add_slide_background(s8)
     add_header(s8, "Live Implementation", "Active 3GPP 5G Core Integration: Open5GS & Linux TUN",
-               "17 real Open5GS core daemons running under WSL2 with active ogstun user-plane tunneling.")
+               "TRL-4 laboratory testbed: 17 Open5GS core daemons running under WSL2 with active ogstun user-plane tunneling.")
 
     # 3 Cards: Core Architecture
     add_card(s8, 0.8, 1.9, 3.6, 4.9, "1. 17 Active Open5GS Daemons", CYAN)
@@ -655,7 +671,7 @@ def create_deck():
         "• 3GPP Rel-17 Compliant:\n"
         "  True service-based architecture (SBA) handling live 5G registration and session management.\n\n"
         "• Real User-Plane Tunnel:\n"
-        "  Linux TUN interface `ogstun` active at 10.45.0.1/16."
+        "  Linux TUN interface `ogstun` active at 10.45.0.1/16 in TRL-4 testbed."
     )
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
@@ -666,32 +682,30 @@ def create_deck():
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
-        "• Live Demonstration Script:\n"
+        "• Demonstration Script:\n"
         "  `scripts/run_open5gs_demo.py` connects Open5GSBackend directly to Controller.\n\n"
         "• RF Jamming Injection:\n"
         "  Applies live Linux kernel `tc netem` impairment (loss + delay) directly onto `ogstun`.\n\n"
         "• Closed-Loop Verification:\n"
-        "  Anomaly score triggers instantly, liboqs executes ML-KEM-768 rekey, and traffic migrates to LEO-2 in real time."
+        "  Anomaly score triggers instantly, liboqs executes ML-KEM-768 rekey, and traffic migrates to LEO-2 in 190ms."
     )
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
-    add_card(s8, 8.8, 1.9, 3.6, 4.9, "3. Rigorous Test Automation", PURPLE)
+    add_card(s8, 8.8, 1.9, 3.6, 4.9, "3. Verification & Governance", PURPLE)
     tb = s8.shapes.add_textbox(Inches(9.0), Inches(2.5), Inches(3.2), Inches(4.1))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
         "• 53 / 53 Passing Unit Tests:\n"
-        "  100% test pass rate across the full test suite.\n\n"
-        "• Core Modules Covered:\n"
-        "  - Routing Hysteresis & Anti-Flapping\n"
-        "  - Anomaly Scoring & EWMA Profiling\n"
-        "  - Post-Quantum Crypto-Agility Engine\n"
-        "  - Telemetry Ingestion & Parser\n"
-        "  - Tactical LEACH Orbital Energy Model\n\n"
-        "• Reproducibility:\n"
-        "  Single-command execution: `pytest tests/ -q`."
+        "  100% test pass rate across routing, anomaly, crypto, and telemetry modules.\n\n"
+        "• Apache License 2.0:\n"
+        "  Permissive open-source license enabling unhindered defense & academic collaboration.\n\n"
+        "• STRIDE Threat Model:\n"
+        "  Formal security architecture and threat boundaries documented in docs/THREAT_MODEL.md.\n\n"
+        "• Single-Command Test:\n"
+        "  `pytest tests/ -q` executes in ~1.2 seconds."
     )
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
@@ -699,12 +713,13 @@ def create_deck():
     s8.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 8 (8:15 - 9:15):\n"
         "To ensure our solution is genuinely deployable in real defense networks, RAKSHA-NET is integrated directly with a functional 3GPP 5G Core: Open5GS.\n\n"
-        "Under our testbed environment in WSL2 Ubuntu 24.04, all 17 Open5GS core daemons are actively running—including the AMF, SMF, UPF, and AUSF. "
+        "Under our TRL-4 testbed environment in WSL2 Ubuntu 24.04, all 17 Open5GS core daemons are actively running—including the AMF, SMF, UPF, and AUSF. "
         "User traffic flows over an active Linux TUN interface `ogstun`.\n\n"
         "In our live demo script (`run_open5gs_demo.py`), we attach our controller directly to this live 5G core. "
         "We inject electronic warfare impairments using Linux kernel traffic control (`tc netem`) right onto the active interface. "
         "The controller detects the perturbation, rekeys the post-quantum session in C, and migrates the route seamlessly.\n\n"
-        "Furthermore, our code is verified by 53 passing automated unit tests, ensuring complete mathematical and operational stability."
+        "Furthermore, our codebase is released under the permissive Apache License 2.0, adheres strictly to the STRIDE threat model in docs/THREAT_MODEL.md, "
+        "and is verified by 53 passing automated unit tests."
     )
 
     # =========================================================================
@@ -713,10 +728,10 @@ def create_deck():
     s9 = prs.slides.add_slide(blank_layout)
     add_slide_background(s9)
     add_header(s9, "Space & Energy Resilience", "Tactical LEACH: Orbital Energy & Bandwidth Optimization",
-               "Preserving satellite constellation battery lifetime and saving 75% telemetry bandwidth in contested orbits.")
+               "TRL-4 orbital simulation: Preserving constellation battery lifetime and saving 75% telemetry bandwidth in contested orbits.")
 
     # Table comparing Classical LEACH vs RAKSHA-NET
-    add_card(s9, 0.8, 1.9, 11.7, 4.9, "Orbital Efficiency & Constellation Sustainability", AMBER)
+    add_card(s9, 0.8, 1.9, 11.7, 4.9, "Orbital Efficiency & Constellation Sustainability (TRL-4 Simulation)", AMBER)
     
     t_shape3 = s9.shapes.add_table(5, 3, Inches(1.1), Inches(2.6), Inches(11.1), Inches(3.8))
     table3 = t_shape3.table
@@ -738,17 +753,17 @@ def create_deck():
 
     r3 = [
         ("PDR Under Electronic Jamming",
-         "41.0% (Cluster heads targeted; routing collapses)",
-         "96.4% PDR (Autonomous cluster head rotation & backup route failover)"),
+         "41.0% (Cluster heads targeted; routing collapses without proactive recovery)",
+         "96.4% PDR (Autonomous cluster head rotation & backup route failover in 190ms)"),
         ("Quantum-Resilient Protection",
-         "None (0-bit security, cleartext or classical ECC)",
+         "None (0-bit security, cleartext or classical ECC vulnerable to HNDL)",
          "NIST ML-KEM-768 Post-Quantum Forward Secrecy integrated into every cluster"),
         ("Telemetry Uplink Bandwidth",
-         "100% Channel Occupancy (Heavy uncompressed telemetry causes satellite link congestion)",
+         "100% Channel Occupancy (Heavy uncompressed telemetry causes uplink congestion)",
          "~75% Bandwidth Saved via lossless zlib moment compression on telemetry streams"),
         ("Satellite Orbital Energy Model",
          "Random probabilistic selection; quickly depletes shadowed satellites",
-         "Residual Battery & Solar Harvest Aware: Prefers satellites currently in solar orbital illumination")
+         "Residual Battery & Solar Harvest Aware: Prefers relays currently in solar orbital illumination")
     ]
 
     for row_idx, data in enumerate(r3):
@@ -770,12 +785,12 @@ def create_deck():
 
     s9.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 9 (9:15 - 10:15):\n"
-        "In satellite constellations, two constraints dominate: electrical battery power and RF channel bandwidth.\n\n"
-        "We incorporated Tactical LEACH principles to optimize constellation sustainability:\n"
+        "In satellite constellations, electrical power and RF channel bandwidth are severely constrained.\n\n"
+        "In our TRL-4 simulation environment, we incorporated Tactical LEACH principles to optimize constellation sustainability:\n"
         "1. Orbital Energy Awareness: Satellites alternate between eclipse and solar illumination. "
         "Classical routing blindly uses whichever relay has the shortest hop, rapidly draining satellites in eclipse. "
         "RAKSHA-NET factors residual battery percentage and orbital solar harvesting into its route utility function.\n\n"
-        "2. In-Flight Telemetry Compression: Telemetry streaming from satellite probes can overwhelm constrained tactical uplinks. "
+        "2. In-Flight Telemetry Compression: High-rate telemetry streaming from satellite probes can overwhelm constrained tactical uplinks. "
         "We implement lossless zlib moment compression, reducing telemetry bandwidth consumption by approximately 75%.\n\n"
         "As shown in our comparative benchmarks, RAKSHA-NET maintains 96.4% PDR under electronic warfare while drastically reducing constellation energy drain."
     )
@@ -785,11 +800,11 @@ def create_deck():
     # =========================================================================
     s10 = prs.slides.add_slide(blank_layout)
     add_slide_background(s10)
-    add_header(s10, "Defensibility & Rigor", "Transparent Honesty Matrix & Defensible Novelty",
-               "Absolute transparency regarding what is 100% real code vs emulated, establishing jury credibility.")
+    add_header(s10, "Defensibility & Rigor", "TRL-4 Honesty Matrix: Real Code vs Emulation",
+               "Absolute transparency regarding TRL-4 laboratory emulation vs real software stack, ensuring jury credibility.")
 
     # Left: What is 100% Real Code
-    add_card(s10, 0.8, 1.9, 5.7, 4.9, "100% Real Software & Tested", GREEN)
+    add_card(s10, 0.8, 1.9, 5.7, 4.9, "100% Real Software & Tested (TRL-4)", GREEN)
     tb_real = s10.shapes.add_textbox(Inches(1.0), Inches(2.5), Inches(5.3), Inches(4.1))
     tf = tb_real.text_frame
     tf.word_wrap = True
@@ -801,40 +816,48 @@ def create_deck():
         "  17 Open5GS microservices actively running with real Linux ogstun tunnel interface.\n\n"
         "✔ Autonomous Control Engines:\n"
         "  EWMA anomaly scoring, Bayesian trust decay, multi-criteria route optimization, 5% hysteresis.\n\n"
-        "✔ Automated Verification Suite:\n"
-        "  53 out of 53 passing pytest unit tests."
+        "✔ Multi-Baseline Verification:\n"
+        "  Superiority verified against Static Routing and Reactive BFD (RFC 5880).\n\n"
+        "✔ Governance & Test Suite:\n"
+        "  Apache 2.0 license, STRIDE Threat Model (docs/THREAT_MODEL.md), 53/53 pytest tests."
     )
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     # Right: Emulated / Modeled (Transparent)
-    add_card(s10, 6.8, 1.9, 5.7, 4.9, "Emulated / Modeled (Standard Practice)", CYAN)
+    add_card(s10, 6.8, 1.9, 5.7, 4.9, "Emulated / Modeled (TRL-4 Lab Prototype — No Physical Spacecraft)", CYAN)
     tb_emu = s10.shapes.add_textbox(Inches(7.0), Inches(2.5), Inches(5.3), Inches(4.1))
     tf = tb_emu.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
-        "• RF Physical Layer:\n"
-        "  Emulated via Linux kernel `tc netem` packet shaping (delay, jitter, and loss injection), rather than physical SDRs.\n\n"
-        "• Orbital Mechanics & Solar Dynamics:\n"
-        "  Constellation orbits and solar exposure modeled computationally—the standard aerospace protocol before flight hardware integration.\n\n"
+        "• Explicit TRL-4 Lab Prototype Disclosure:\n"
+        "  Laboratory breadboard & component validation; strictly software-in-the-loop.\n\n"
+        "• Zero Physical Satellite Deployments:\n"
+        "  NO physical satellites in orbit, NO space-qualified payloads, NO commercial silicon claimed.\n\n"
+        "• RF Physical Layer Emulation:\n"
+        "  Linux kernel `tc netem` packet shaping (loss, delay, jitter injection), rather than physical SDRs.\n\n"
+        "• Orbital Dynamics Modeling:\n"
+        "  Keplerian orbital passes and solar eclipse modeled computationally (standard aerospace protocol).\n\n"
         "• Defensible Novelty Statement to Jury:\n"
-        "  'We do not claim to invent a new cipher or launch a satellite. Our novel contribution is the container-native, coordinated execution of zero-trust route recovery and post-quantum session rekeying under simulated electronic warfare.'"
+        "  'We do not claim to invent a new cipher or launch a physical satellite. Our defensible novelty is the container-native, coordinated execution of proactive zero-trust route recovery and post-quantum session rekeying under electronic warfare, fully validated at TRL-4.'"
     )
-    p.font.size = Pt(10)
+    p.font.size = Pt(9.5)
     p.font.color.rgb = TEXT_BODY
 
     s10.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 10 (10:15 - 11:15):\n"
-        "Juries deeply respect technical honesty. We want to be completely transparent about what is running in live code versus what is modeled.\n\n"
-        "What is 100% Real Code:\n"
-        "- Our Post-Quantum Cryptography is not a simulation: it is the real NIST ML-KEM-768 running via native C liboqs routines.\n"
+        "Juries deeply value scientific honesty. We want to state unequivocally our exact Technology Readiness Level:\n"
+        "RAKSHA-NET is a TRL-4 laboratory prototype. We make zero claim of having launched physical satellites or deployed spaceflight hardware.\n\n"
+        "What is 100% Real Software:\n"
+        "- Our Post-Quantum Cryptography is the real NIST ML-KEM-768 running via native C liboqs routines.\n"
         "- Our 5G Core is the real Open5GS stack running 17 active daemons with real network tunneling.\n"
-        "- Our anomaly detection, trust scoring, and routing engines are live, verified by 53 passing automated unit tests.\n\n"
+        "- Our anomaly detection, trust scoring, and routing engines are live, verified by 53 passing automated unit tests.\n"
+        "- The software is open source under Apache 2.0 and governed by our STRIDE Threat Model in docs/THREAT_MODEL.md.\n\n"
         "What is Emulated:\n"
         "- The RF physical layer is emulated using Linux kernel `tc netem` packet shaping, and orbital passes are modeled computationally. "
-        "This is standard aerospace engineering methodology for control-plane validation prior to physical hardware payload launches.\n\n"
-        "Our novelty is not inventing a new mathematical cipher—it is the systems-level coordination of zero-trust routing and post-quantum rekeying to guarantee battlefield communications survivability."
+        "This is standard aerospace engineering methodology for control-plane validation prior to hardware integration.\n\n"
+        "Our contribution is not inventing a new mathematical cipher or launching a satellite—it is the systems-level coordination of zero-trust routing and post-quantum rekeying to guarantee communications survivability."
     )
 
     # =========================================================================
@@ -843,7 +866,7 @@ def create_deck():
     s11 = prs.slides.add_slide(blank_layout)
     add_slide_background(s11)
     add_header(s11, "Strategic Vision", "National Impact, Technology Sovereignty & 12-Month Roadmap",
-               "Empowering India's defense and aerospace ecosystem through indigenous, export-unrestricted cyber defense.")
+               "Empowering India's defense ecosystem through Apache-2.0 open-source innovation, advancing from TRL-4 to TRL-7.")
 
     # Left: Strategic Value
     add_card(s11, 0.8, 1.9, 4.8, 4.9, "National Sovereignty & Inclusion", GREEN)
@@ -854,30 +877,30 @@ def create_deck():
     p.text = (
         "• Atmanirbhar Bharat Alignment:\n"
         "  Eliminates dependence on proprietary foreign defense hardware; ready for Indian Shakti / Vega RISC-V processors.\n\n"
-        "• Institutional Synergies:\n"
-        "  Targeted for iDEX challenges, DRDO (CAIR/DEAL) tactical testing, and IN-SPACe satellite integration.\n\n"
-        "• Civilian Inclusion:\n"
-        "  Preserves critical telecom in isolated Himalayan border villages and island territories.\n\n"
-        "• Disaster Response:\n"
-        "  Deployable on temporary UAV relays or fly-away kits when terrestrial fiber is severed."
+        "• Open Source Defense Commons:\n"
+        "  Permissive Apache 2.0 license enables seamless integration by DRDO (CAIR/DEAL), iDEX partners, and universities.\n\n"
+        "• Security Assurance:\n"
+        "  STRIDE threat model in docs/THREAT_MODEL.md provides clear operational security specifications.\n\n"
+        "• Civilian & Tactical Inclusion:\n"
+        "  Maintains communications in isolated Himalayan outposts, island territories, or disaster fly-away kits."
     )
     p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     # Right: 12-Month Roadmap
-    add_card(s11, 5.9, 1.9, 6.6, 4.9, "12-Month Technical Roadmap", CYAN)
+    add_card(s11, 5.9, 1.9, 6.6, 4.9, "12-Month Technical Roadmap (TRL-4 to TRL-7)", CYAN)
     tb_map = s11.shapes.add_textbox(Inches(6.1), Inches(2.5), Inches(6.2), Inches(4.1))
     tf = tb_map.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
-        "Phase 1: Laboratory Prototype (COMPLETED)\n"
-        "  ✔ Open5GS core integration, native C liboqs, 10-trial benchmark, 53/53 tests.\n\n"
-        "Phase 2: Physical RF Validation (Months 1–3)\n"
+        "Phase 1: TRL-4 Laboratory Prototype (COMPLETED)\n"
+        "  ✔ Open5GS core integration, native C liboqs, BFD comparison, Apache 2.0, 53/53 tests.\n\n"
+        "Phase 2: Physical RF SDR Validation (Months 1–3) [TRL-5 Target]\n"
         "  ▶ Connect physical Software-Defined Radios (HackRF / USRP B210) via GNU Radio and ZMQ to test over physical RF channels.\n\n"
-        "Phase 3: Over-the-Air 5G & Embedded ARM (Months 4–6)\n"
+        "Phase 3: Over-the-Air 5G & Embedded ARM (Months 4–6) [TRL-6 Target]\n"
         "  ▶ Deploy with open-source srsRAN gNodeBs and benchmark on embedded ARM hardware (Jetson / Raspberry Pi CM4).\n\n"
-        "Phase 4: Orbital Flight Payload Proposal (Months 7–12)\n"
+        "Phase 4: Orbital Flight Payload Proposal (Months 7–12) [TRL-7 Target]\n"
         "  ▶ Formal security audit of session keys and proposal for a 3U CubeSat demonstration payload with IN-SPACe / ISRO."
     )
     p.font.size = Pt(10)
@@ -886,14 +909,13 @@ def create_deck():
     s11.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 11 (11:15 - 12:15):\n"
         "Looking at national impact, RAKSHA-NET directly serves India's strategic defense sovereignty.\n"
-        "By replacing foreign proprietary cryptographic black-boxes with a container-native software controller, "
+        "By replacing foreign proprietary cryptographic black-boxes with an Apache 2.0 licensed software controller, "
         "we eliminate foreign supply-chain risks. It can run on commercial COTS processors or India's indigenous Shakti and Vega RISC-V chips.\n\n"
-        "Beyond defense, RAKSHA-NET provides vital civilian inclusion: maintaining emergency telecom across Himalayan border outposts, "
-        "Andaman & Nicobar island territories, and natural disaster zones where fiber is disrupted.\n\n"
-        "Our roadmap is concrete:\n"
-        "- Having completed Phase 1 in the lab, Phase 2 in Months 1 to 3 connects physical Software-Defined Radios using GNU Radio.\n"
-        "- Phase 3 in Months 4 to 6 integrates over-the-air srsRAN 5G basestations on embedded ARM hardware.\n"
-        "- And Phase 4 in Months 7 to 12 aims to propose a flight payload for an Indian CubeSat orbital mission via IN-SPACe."
+        "Our formal threat model in docs/THREAT_MODEL.md ensures verified security posture, while enabling civilian disaster resilience in remote territories.\n\n"
+        "Our roadmap defines a clear maturation path from laboratory emulation to space flight:\n"
+        "- Having completed Phase 1 at TRL-4 in the lab, Phase 2 in Months 1 to 3 targets TRL-5 by connecting physical Software-Defined Radios using GNU Radio.\n"
+        "- Phase 3 in Months 4 to 6 targets TRL-6 by integrating over-the-air srsRAN 5G basestations on embedded ARM hardware.\n"
+        "- And Phase 4 in Months 7 to 12 targets TRL-7 by proposing a flight payload for an Indian CubeSat orbital demonstration via IN-SPACe."
     )
 
     # =========================================================================
@@ -902,7 +924,7 @@ def create_deck():
     s12 = prs.slides.add_slide(blank_layout)
     add_slide_background(s12)
     add_header(s12, "Summary & Demonstration", "Conclusion: Mission Readiness & Live Demo Invocation",
-               "Proven sub-second resilience, verified post-quantum security, and ready for live inspection.")
+               "Proven sub-second resilience, verified post-quantum security, TRL-4 validated, and ready for live inspection.")
 
     # 3 Summary Cards
     add_card(s12, 0.8, 1.9, 3.6, 3.6, "Availability Restored", GREEN)
@@ -912,11 +934,11 @@ def create_deck():
     p = tf.paragraphs[0]
     p.text = (
         "• 96.8% PDR Restored\n"
-        "  Static routing collapses to 32.3% PDR; RAKSHA-NET delivers a +64.5% net advantage.\n\n"
-        "• 190 ms Failover\n"
-        "  Autonomous path migration to LEO-2 with zero route flapping."
+        "  +64.5 pp gain over static routing (32.3% PDR) and +21.0 pp gain over Reactive BFD (76.0% PDR).\n\n"
+        "• 190 ms Proactive Failover\n"
+        "  Sub-second path migration to LEO-2 with zero route flapping (vs 1.5–2.8s BFD timeout)."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     add_card(s12, 4.8, 1.9, 3.6, 3.6, "Quantum-Proof Security", PURPLE)
@@ -926,25 +948,25 @@ def create_deck():
     p = tf.paragraphs[0]
     p.text = (
         "• NIST ML-KEM-768\n"
-        "  Native C execution provides sub-millisecond (0.48ms) forward-secret rekeying.\n\n"
-        "• Zero-Trust Isolation\n"
-        "  Compromised satellite nodes programmatically quarantined in <200ms."
+        "  Native C execution provides sub-millisecond (0.48ms) dual-hybrid forward-secret rekeying.\n\n"
+        "• Zero-Trust STRIDE Model\n"
+        "  Quarantines compromised relays in <200ms following docs/THREAT_MODEL.md specifications."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
-    add_card(s12, 8.8, 1.9, 3.6, 3.6, "Sovereign & Verified", CYAN)
+    add_card(s12, 8.8, 1.9, 3.6, 3.6, "TRL-4 Open Source", CYAN)
     tb = s12.shapes.add_textbox(Inches(9.0), Inches(2.5), Inches(3.2), Inches(2.8))
     tf = tb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = (
-        "• 100% Software-Defined\n"
-        "  Container-native Docker CNFs; no foreign proprietary hardware dependency.\n\n"
+        "• Apache License 2.0\n"
+        "  100% open-source software-defined controller; container-native Docker CNFs (<60 MB RAM).\n\n"
         "• Live 5G Core Verified\n"
-        "  Connected to 17 Open5GS daemons; 53/53 automated pytest unit tests passing."
+        "  17 Open5GS daemons running; 53/53 pytest tests passing (TRL-4 laboratory emulation disclosure)."
     )
-    p.font.size = Pt(10.5)
+    p.font.size = Pt(10)
     p.font.color.rgb = TEXT_BODY
 
     # Live Demo Banner at Bottom
@@ -965,19 +987,23 @@ def create_deck():
     p.font.color.rgb = CYAN
 
     p_cmd = tf.add_paragraph()
-    p_cmd.text = "1. Terminal Open5GS Demo: python -m scripts.run_open5gs_demo  |  2. Live Streamlit Dashboard: localhost:8501  |  3. Tests: pytest tests/"
+    p_cmd.text = (
+        "1. Open5GS Live Demo: python -m scripts.run_open5gs_demo  |  "
+        "2. Multi-Baseline Scenario: python scripts/run_scenario.py --trials 5 --compare-static  |  "
+        "3. Tests: pytest tests/"
+    )
     p_cmd.font.name = FONT_BODY
-    p_cmd.font.size = Pt(10)
+    p_cmd.font.size = Pt(9.5)
     p_cmd.font.color.rgb = TEXT_WHITE
 
     s12.notes_slide.notes_text_frame.text = (
         "SPEAKER SCRIPT — SLIDE 12 (12:15 - 13:00):\n"
         "To conclude, RAKSHA-NET proves that tactical communications resilience and post-quantum security can operate in sub-second unison.\n\n"
-        "When electronic warfare strikes, static routing collapses to 32% packet delivery. "
-        "RAKSHA-NET detects the telemetry perturbation, fails over in 190 milliseconds, restores delivery to 97%, "
+        "When electronic warfare strikes, static routing collapses to 32% PDR, and standard 3GPP Reactive BFD delays recovery by up to 2.8 seconds. "
+        "RAKSHA-NET detects the telemetry perturbation proactively, fails over in 190 milliseconds, restores delivery to 97% (+64.5 pp vs static, +21.0 pp vs BFD), "
         "and rekeys the session using NIST ML-KEM-768 in under half a millisecond.\n\n"
-        "Our prototype is running live right here on our machine with Open5GS and Streamlit. "
-        "We welcome the jury to inspect our live demonstration, review our codebase, and we are ready for your questions. Thank you!"
+        "Our prototype is 100% open source under Apache 2.0, evaluated at TRL-4 in our laboratory testbed, and governed by our STRIDE Threat Model in docs/THREAT_MODEL.md. "
+        "We welcome the jury to inspect our live demonstration, review our codebase, and we look forward to your questions. Thank you!"
     )
 
     prs.save(str(OUTPUT_FILE))

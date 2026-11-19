@@ -4,22 +4,39 @@ run_all_tests.py
 ================
 Self-contained automated test runner for AICOP-RAKSHA.
 Runs all 4 test suites (48 test functions / 53 parameterized executions)
-using native Python without requiring external pytest dependencies.
+using native Python without requiring external pytest dependencies,
+while also seamlessly supporting environments where pytest is installed.
 """
 import sys
 import os
 import inspect
 import types
+import warnings
 from pathlib import Path
+
+# Suppress external package deprecation warnings (e.g., pkg_resources from docutils)
+warnings.filterwarnings("ignore", message=".*pkg_resources is deprecated.*")
 
 # Ensure raksha-net root is on sys.path
 BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-# Provide mock pytest if not installed
+# Provide mock pytest if not installed, or augment installed pytest for standalone runner
 try:
     import pytest
+    _orig_parametrize = getattr(pytest.mark, "parametrize", None)
+    if _orig_parametrize:
+        def _wrapped_parametrize(argnames, argvalues, *args, **kwargs):
+            dec = _orig_parametrize(argnames, argvalues, *args, **kwargs)
+            def wrapper(func):
+                marked = dec(func)
+                marked._pytest_parametrize = (argnames, argvalues)
+                if hasattr(marked, "__func__"):
+                    marked.__func__._pytest_parametrize = (argnames, argvalues)
+                return marked
+            return wrapper
+        pytest.mark.parametrize = _wrapped_parametrize
 except ImportError:
     class MockPytest(types.ModuleType):
         class Mark:
@@ -66,6 +83,32 @@ except ImportError:
 
     mock_pytest = MockPytest("pytest")
     sys.modules["pytest"] = mock_pytest
+
+def _get_parametrize_info(func):
+    """Extract parametrization info from both mock pytest and real pytest marks."""
+    targets = [func]
+    if hasattr(func, "__func__"):
+        targets.append(func.__func__)
+
+    for t in targets:
+        if t is None:
+            continue
+        # 1. Custom attribute
+        if hasattr(t, "_pytest_parametrize"):
+            return getattr(t, "_pytest_parametrize")
+        # 2. Real pytestmark
+        marks = getattr(t, "pytestmark", [])
+        if not isinstance(marks, (list, tuple)):
+            marks = [marks]
+        for m in marks:
+            if getattr(m, "name", None) == "parametrize":
+                args = getattr(m, "args", ())
+                if len(args) >= 2:
+                    return (args[0], args[1])
+                kwargs = getattr(m, "kwargs", {})
+                if "argnames" in kwargs and "argvalues" in kwargs:
+                    return (kwargs["argnames"], kwargs["argvalues"])
+    return None
 
 def discover_and_run():
     test_files = [
@@ -118,14 +161,17 @@ def discover_and_run():
                         items_to_run.append((instance, f"{name}.{m_name}", m_func))
 
         for inst, full_name, func in items_to_run:
-            param_info = getattr(func, "_pytest_parametrize", None)
+            param_info = _get_parametrize_info(func)
             if param_info:
                 argnames, argvalues = param_info
                 for val in argvalues:
                     total_run += 1
                     test_label = f"{full_name}[{val}]"
                     try:
-                        func(val)
+                        if isinstance(argnames, str) and "," in argnames and isinstance(val, (tuple, list)):
+                            func(*val)
+                        else:
+                            func(val)
                         print(f"  [PASS] {test_label}")
                         total_passed += 1
                     except Exception as e:

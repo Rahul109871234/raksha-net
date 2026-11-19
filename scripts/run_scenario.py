@@ -82,12 +82,43 @@ def trial (seed :int ,verbose :bool =False ,detector_name :str ='heuristic',comp
     ev =[e for e in c .sec .events if e .rekey_ms >0 and e .backend !='MOCK']
     rekey_ms =ev [0 ].rekey_ms if ev else None 
     result ={'seed':seed ,'t_onset_ms':t_onset_ms ,'t_detect_ms':t_detect_ms ,'t_decision_ms':switch_t ,'t_new_route_ms':switch_t ,'t_pdr_recovered_ms':t_pdr_recovered ,'route_recovery_ms':switch_t -t_onset_ms if switch_t else None ,'pdr_before':round (pdr_before ,3 ),'pdr_degraded_window':pdr_degraded_window ,'pdr_after':round (pdr_after ,3 ),'dip_pdr':dip_pdr ,'pdr_during':pdr_degraded_window ,'rekey_ms':round (rekey_ms ,3 )if rekey_ms else None ,'backend':BACKEND ,'detector':c .detector_name }
-    if compare_static :
-        stat =_static_trial (seed =seed ,onset_extra =onset_extra ,t_onset_ms =t_onset_ms ,switch_t =switch_t ,attack_end_t =attack_end_t )
-        result .update (stat )
-    if verbose :
-        log .info ('RESULT: %s',result )
-    return result 
+    if compare_static:
+        stat = _static_trial(seed=seed, onset_extra=onset_extra, t_onset_ms=t_onset_ms, switch_t=switch_t, attack_end_t=attack_end_t)
+        result.update(stat)
+        bfd = _bfd_trial(seed=seed, onset_extra=onset_extra, t_onset_ms=t_onset_ms, switch_t=switch_t, attack_end_t=attack_end_t)
+        result.update(bfd)
+    if verbose:
+        log.info('RESULT: %s', result)
+    return result
+
+def _bfd_trial(seed: int, onset_extra: int, t_onset_ms: int, switch_t: Optional[int], attack_end_t: int) -> dict:
+    from controller.route_engine import ReactiveBFDRouteEngine
+    cb = Controller(seed=seed, detector_name='heuristic', allow_recovery=False, ramp_steps=RAMP_STEPS)
+    cb.router = ReactiveBFDRouteEngine(list(cb.router.routes.values()), loss_threshold=0.40, hold_ticks=15)
+    for _ in range(NORMAL_CYCLES + onset_extra):
+        cb.step(DT_MS)
+    cb.net.set_profile('GW-LEO1', 'severe')
+    cb.net.set_profile('LEO1-B', 'severe')
+    bfd_log: list = []
+    bfd_switch_t = None
+    for _ in range(ATTACK_CYCLES):
+        d, ok, n = cb.step(DT_MS)
+        if bfd_switch_t is None and d.chosen == 'R2':
+            bfd_switch_t = cb.net.t_ms
+        bfd_log.append((cb.net.t_ms, cb.router.active, ok / n if n else 0))
+    bfd_pdr_degraded = round(_window_pdr(bfd_log, t_onset_ms, attack_end_t), 3)
+    bfd_dip_pdr = round(_window_pdr(bfd_log, t_onset_ms, bfd_switch_t), 3) if bfd_switch_t else bfd_pdr_degraded
+    cb.net.set_profile('GW-LEO1', 'normal')
+    cb.net.set_profile('LEO1-B', 'normal')
+    for _ in range(RECOVERY_CYCLES - 50):
+        cb.step(DT_MS)
+    bfd_pdr_after = round(_window_pdr([(cb.net.t_ms, '', _pdr(cb, 50))], cb.net.t_ms - 50 * DT_MS, cb.net.t_ms + DT_MS), 3)
+    return {
+        'bfd_pdr_degraded_window': bfd_pdr_degraded,
+        'bfd_pdr_after': bfd_pdr_after,
+        'bfd_dip_pdr': bfd_dip_pdr,
+        'bfd_recovery_ms': bfd_switch_t - t_onset_ms if bfd_switch_t else None,
+    } 
 
 def _static_trial (seed :int ,onset_extra :int ,t_onset_ms :int ,switch_t :Optional [int ],attack_end_t :int )->dict :
     cs =Controller (seed =seed ,detector_name ='heuristic',allow_recovery =False ,ramp_steps =RAMP_STEPS )
@@ -143,6 +174,12 @@ def _summarise (rows :list [dict ]):
             st_sd =_st .pstdev (st_v )
             print (f'  {label :<30} {ai_m :.3f}({ai_sd :.3f}) {st_m :.3f}({st_sd :.3f})    {ai_m -st_m :+.3f}')
         _fmt ('pdr_degraded_window',pdw ,spd )
+        if rows[0].get('bfd_pdr_degraded_window') is not None:
+            bfd_dw = [r['bfd_pdr_degraded_window'] for r in rows]
+            bfd_m = _st.mean(bfd_dw)
+            bfd_sd = _st.pstdev(bfd_dw)
+            ai_m = _st.mean(pdw)
+            print(f"  {'pdr_degraded (vs Reactive BFD)':<30} {ai_m:.3f}         {bfd_m:.3f}({bfd_sd:.3f})    {ai_m - bfd_m:+.3f}")
         _fmt ('pdr_after',pa ,spa )
         try :
             from scipy import stats 

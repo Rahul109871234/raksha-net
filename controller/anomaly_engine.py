@@ -88,56 +88,78 @@ class CUSUMDetector:
         # Normalized anomaly score [0.0, 1.0]
         return round(min(1.0, curr_s / self.h), 3)
 
-class AICOPDetector :
+class AICOPDetector:
+    LABEL = 'AICOP-GraphSAGE'
 
-    def __init__ (self ):
-        self ._fallback :HeuristicDetector |None =None 
-        self ._infer =None 
-        self ._ckpt_path =os .environ .get ('AICOP_CKPT','')
-        self ._module_path =os .environ .get ('AICOP_MODULE','')
-        self .LABEL ='AICOP-GraphSAGE'
-        if not (self ._ckpt_path and self ._module_path ):
-            print ('[AICOPDetector] AICOP_CKPT / AICOP_MODULE not set — falling back to HeuristicDetector (NOT labelled AICOP)')
-            self ._fallback =HeuristicDetector ()
-            self .LABEL ='HeuristicDetector (AICOP fallback)'
-            return 
-        try :
-            spec =importlib .util .spec_from_file_location ('aicop_inference',self ._module_path )
-            mod =importlib .util .module_from_spec (spec )
-            spec .loader .exec_module (mod )
-            self ._infer =mod .infer 
-            if hasattr (mod ,'load_checkpoint'):
-                mod .load_checkpoint (self ._ckpt_path )
-            print (f'[AICOPDetector] Loaded from {self ._module_path } | ckpt={self ._ckpt_path }')
-        except Exception as exc :
-            print (f'[AICOPDetector] Load failed ({exc }) — falling back to HeuristicDetector')
-            self ._fallback =HeuristicDetector ()
-            self .LABEL ='HeuristicDetector (AICOP load-failed)'
+    def __init__(self):
+        self._fallback = None
+        self._infer = None
+        self._bridge = None
+        self._graph_sage = None
+        self._ckpt_path = os.environ.get('AICOP_CKPT', '')
+        self._module_path = os.environ.get('AICOP_MODULE', '')
+        
+        # 1. Custom external checkpoint if supplied via environment
+        if self._ckpt_path and self._module_path:
+            try:
+                spec = importlib.util.spec_from_file_location('aicop_inference', self._module_path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                self._infer = mod.infer
+                if hasattr(mod, 'load_checkpoint'):
+                    mod.load_checkpoint(self._ckpt_path)
+                print(f'[AICOPDetector] Loaded custom module from {self._module_path} | ckpt={self._ckpt_path}')
+                return
+            except Exception as exc:
+                print(f'[AICOPDetector] Custom load failed ({exc}) — falling back to internal bridge')
 
-    def score (self ,hist :List [LinkTelemetry ])->float :
-        if self ._fallback is not None :
-            return self ._fallback .score (hist )
-        if not hist :
-            return 0.0 
-        graph =build_graph (hist )
-        try :
-            result =self ._infer (graph )
-            return round (float (result ),3 )
-        except Exception :
-            return self ._fallback .score (hist )if self ._fallback else 0.0 
+        # 2. Built-in Open-Source GraphSAGE Bridge (Included directly in repository)
+        try:
+            from controller.aicop_bridge import UnifiedAICOPBridge
+            self._bridge = UnifiedAICOPBridge()
+            self._graph_sage = GraphSAGEFallback()
+            self.LABEL = 'AICOP-GraphSAGE (Built-in weights)'
+            print('[AICOPDetector] Initialized built-in UnifiedAICOPBridge & GraphSAGE (models/aicop_trust_engine.npz)')
+        except Exception as e:
+            print(f'[AICOPDetector] Bridge load error ({e}) — falling back to HeuristicDetector')
+            self._fallback = HeuristicDetector()
+            self.LABEL = 'HeuristicDetector (AICOP fallback)'
 
-class GraphSAGEFallback :
-    LABEL ='synthetic-trained GraphSAGE-style detector'
+    def score(self, hist: List[LinkTelemetry]) -> float:
+        if self._infer is not None:
+            if not hist:
+                return 0.0
+            graph = build_graph(hist)
+            try:
+                result = self._infer(graph)
+                return round(float(result), 3)
+            except Exception:
+                pass
+        if self._graph_sage is not None and self._graph_sage._loaded:
+            return self._graph_sage.score(hist)
+        if self._fallback is not None:
+            return self._fallback.score(hist)
+        return 0.0
 
-    def __init__ (self ,weights_path :str |None =None ):
-        self ._w1 :np .ndarray |None =None 
-        self ._w2 :np .ndarray |None =None 
-        self ._b1 :np .ndarray |None =None 
-        self ._b2 :np .ndarray |None =None 
-        self ._loaded =False 
-        self ._fallback =HeuristicDetector ()
-        if weights_path :
-            self .load (weights_path )
+class GraphSAGEFallback:
+    LABEL = 'synthetic-trained GraphSAGE-style detector'
+
+    def __init__(self, weights_path: str | None = None):
+        self._w1: np.ndarray | None = None
+        self._w2: np.ndarray | None = None
+        self._b1: np.ndarray | None = None
+        self._b2: np.ndarray | None = None
+        self._loaded = False
+        self._fallback = HeuristicDetector()
+        
+        if weights_path is None:
+            import pathlib
+            default_path = pathlib.Path(__file__).resolve().parent.parent / 'models' / 'graphsage_fallback.npz'
+            if default_path.exists():
+                weights_path = str(default_path)
+                
+        if weights_path:
+            self.load(weights_path)
 
     def load (self ,path :str ):
         try :

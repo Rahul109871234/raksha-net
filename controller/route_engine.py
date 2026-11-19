@@ -131,3 +131,43 @@ class RouteEngine:
             self.step_energy(active_via)
 
         return RouteDecision(t_ms, self.active, prev, scores, reason)
+
+
+class ReactiveBFDRouteEngine:
+    """
+    Standard industry reactive baseline: Bidirectional Forwarding Detection (BFD)
+    with loss hold-timer timeout (RFC 5880 / 3GPP TS 38.300).
+    Unlike proactive AICOP-RAKSHA (which predicts cross-layer degradation in ~188ms),
+    reactive BFD waits for consecutive loss samples exceeding the threshold (e.g. loss > 0.40
+    for 1.5 seconds / 15 control cycles) before triggering failover.
+    """
+    def __init__(self, routes: List[Route], loss_threshold: float = 0.40, hold_ticks: int = 15):
+        self.routes = {r.name: r for r in routes}
+        self.route_list = list(routes)
+        self.active = routes[0].name
+        self.loss_threshold = loss_threshold
+        self.hold_ticks = hold_ticks
+        self._consecutive_loss_ticks = 0
+
+    def decide(self, t_ms: int, tel: Dict[str, LinkTelemetry], st: Dict[str, LinkState]) -> RouteDecision:
+        curr_route = self.routes[self.active]
+        curr_loss = max((tel[h].loss for h in curr_route.hops), default=0.0)
+        prev = self.active
+
+        if curr_loss >= self.loss_threshold:
+            self._consecutive_loss_ticks += 1
+        else:
+            self._consecutive_loss_ticks = max(0, self._consecutive_loss_ticks - 1)
+
+        scores = {r.name: 1.0 if r.name == self.active else 0.5 for r in self.route_list}
+        reason = 'keep (monitoring loss)'
+
+        if self._consecutive_loss_ticks >= self.hold_ticks:
+            alternatives = [r for r in self.route_list if r.name != self.active]
+            if alternatives:
+                best_alt = min(alternatives, key=lambda r: max((tel[h].loss for h in r.hops), default=0.0))
+                self.active = best_alt.name
+                reason = f'BFD timeout expired ({self._consecutive_loss_ticks} ticks); failover to {self.active}'
+                self._consecutive_loss_ticks = 0
+
+        return RouteDecision(t_ms, self.active, prev, scores, reason)

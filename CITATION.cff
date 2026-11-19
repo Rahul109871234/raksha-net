@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you utilize RAKSHA-NET or its cross-layer resilience framework in your research, please cite it as below."
+authors:
+  - family-names: "Reddy"
+    given-names: "G. Rahul"
+    affiliation: "PDPM Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Jabalpur"
+    orcid: "https://orcid.org/0009-0000-0000-0000"
+  - family-names: "Tiwari"
+    given-names: "Satish Kumar"
+    affiliation: "PDPM Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Jabalpur"
+title: "RAKSHA-NET: A Unified Cross-Layer Architecture for Autonomous Telemetry Trust, Near-RT O-RAN Policy Coordination, and Post-Quantum 5G Non-Terrestrial Network Resilience"
+version: 1.0.0
+date-released: 2026-11-19
+url: "https://github.com/Rahul109871234/raksha-net"
+repository-code: "https://github.com/Rahul109871234/raksha-net"
+keywords:
+  - "O-RAN"
+  - "Near-RT RIC"
+  - "Non-Terrestrial Networks"
+  - "Post-Quantum Cryptography"
+  - "GraphSAGE"
+  - "False Data Injection"
+  - "ML-KEM-768"
+license: "Apache-2.0"

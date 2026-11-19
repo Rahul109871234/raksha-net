@@ -154,7 +154,8 @@ class UnifiedController:
                 self.active_route_id = "R2"
                 self.last_failover_tick = tick
                 did_failover = True
-                # Configured transition model: 190ms if pre-armed, 230ms if standalone
+                # Simulated transition model: 190.0 ms if pre-armed, 230.0 ms if standalone CUSUM
+                # (Analytical model: 20 ms BFD micro-sampling + kernel FIB interface update)
                 failover_ms = 190.0 if self.is_pre_armed else 230.0
                 
                 # Disarm pre-arming now that failover has been actuated

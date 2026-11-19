@@ -3,7 +3,7 @@
 PDPM IIITDM Jabalpur — Sovereign Technology for India
 Results from statistical simulation.
 
-[![Tests](https://img.shields.io/badge/tests-45%20passed-22c55e)](tests/)
+[![Tests](https://img.shields.io/badge/tests-53%20passed-22c55e)](tests/)
 [![Backend](https://img.shields.io/badge/crypto-MOCK%20(liboqs%20optional)-f59e0b)](controller/security_engine.py)
 [![Python](https://img.shields.io/badge/python-3.10%2B-3b82f6)](requirements.txt)
 
@@ -18,8 +18,8 @@ Normal → link degradation/jamming → anomaly detected → trust drops
 Impaired LEO-profile links are rate-limited to 8-50 Mbit/s;
 results for those are in results/summary.md.
 
-- **Crypto-Agility Engine:** Dynamically chooses between ChaCha20 and AES-GCM (ChaCha20 is for CPUs without AES acceleration like ARM edge nodes). Benchmarks in `results/crypto_benchmark.md` show per-suite AEAD throughput of ~117.1 MB/s for ChaCha20-Poly1305 and ~145.5 MB/s for AES-256-GCM.
-- **AI vs Static Routing:** The AI routing maintains a PDR of 0.970 during link degradation, while static routing drops to 0.327 (see `results/summary.md`).
+- **Crypto-Agility Engine:** Dynamically chooses between ChaCha20 and AES-GCM (ChaCha20 is for CPUs without AES acceleration like ARM edge nodes). Benchmarks in `results/crypto_benchmark.md` show per-suite AEAD throughput of ~55.6–57.4 MB/s for ChaCha20-Poly1305 and ~74.1–74.3 MB/s for AES-256-GCM.
+- **AI vs Static Routing:** The AI routing maintains a PDR of 0.970 during link degradation, while static routing drops to 0.325 in 20-trial emulated runs (see `results/summary.md`). In large-scale 100-seed Monte Carlo evaluation (`results/batch_100_seeds_experiment.csv`), AICOP restores PDR from 29.6% to 96.8% (+67.16 pp).
 
 ## Quickstart — Simulated Mode (No Docker, No Hardware)
 
@@ -36,8 +36,8 @@ python -m scripts.run_scenario --trials 20 --csv results/experiment.csv --compar
 # Generate report + charts
 python scripts/make_report.py --csv results/experiment.csv
 
-# Run all tests (45 tests)
-python -m pytest -q tests/
+# Run all tests (53 tests parameterized)
+python run_all_tests.py
 ```
 
 ## Quickstart — Live Dashboard

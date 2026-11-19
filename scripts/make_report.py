@@ -13,7 +13,7 @@ import pandas as pd
 
 sys .path .insert (0 ,str (pathlib .Path (__file__ ).parent .parent ))
 
-RESULTS_DIR =pathlib .Path ("results")
+RESULTS_DIR = pathlib.Path(__file__).resolve().parent.parent / "results"
 RESULTS_DIR .mkdir (exist_ok =True )
 
 
@@ -129,7 +129,9 @@ def generate_report (df :pd .DataFrame ,csv_path :pathlib .Path ):
 """
     out_md = RESULTS_DIR / f"{csv_path.stem}_report.md"
     out_md.write_text(summary)
-    print(f"Report written -> {out_md}")
+    summary_md = RESULTS_DIR / "summary.md"
+    summary_md.write_text(summary)
+    print(f"Report written -> {out_md} and {summary_md}")
 
     # Generate charts
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -172,10 +174,12 @@ def generate_report (df :pd .DataFrame ,csv_path :pathlib .Path ):
 
 def main():
     ap = argparse.ArgumentParser(description="Generate experiment report & charts")
-    ap.add_argument("csv", nargs="?", default="results/benchmark_heuristic.csv", help="Path to scenario CSV")
+    ap.add_argument("csv_pos", nargs="?", default=None, help="Path to scenario CSV")
+    ap.add_argument("--csv", default=None, help="Path to scenario CSV")
     a = ap.parse_args()
 
-    csv_p = pathlib.Path(a.csv)
+    csv_target = a.csv or a.csv_pos or str(RESULTS_DIR / "benchmark_heuristic.csv")
+    csv_p = pathlib.Path(csv_target)
     if not csv_p.exists():
         print(f"CSV not found: {csv_p}")
         sys.exit(1)

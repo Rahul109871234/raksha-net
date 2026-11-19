@@ -32,7 +32,7 @@ RESCUE-NET guarantees that frontline sensor data, survivor vitals, and robotic t
 | **"Sensors & IoT Devices"** | Multi-hop ad-hoc wireless sensor network collecting victim biometric vitals, seismic vibrations, gas leaks, and water levels. | Low-cost **ESP32 + Semtech SX1276 LoRa transceivers (868/433 MHz)** and BLE beacon mesh nodes. |
 | **"Robots / Autonomous Systems"** | Autonomous search-and-rescue UAVs acting as mobile aerial cluster heads (LEACH) and relay nodes over disaster debris. | Raspberry Pi 5 / Jetson Nano mounted on quadcopter flight controller (PX4/ArduPilot via MAVLink). |
 | **"Artificial Intelligence"** | On-device near-real-time anomaly detection, concept drift tracking, and multi-objective routing optimization. | Pure-NumPy inductive GraphSAGE kernel & EWMA/CUSUM change-point detector ($<10\text{ms}$ inference, zero GPU dependency). |
-| **"Real-World Problem"** | Total communications blackout during natural disasters (e.g., Wayanad landslides, Himalayan floods) and tactical electronic warfare. | Resilient hybrid terrestrial-to-satellite failover restoring mission delivery from **32.3% back to 96.8%**. |
+| **"Real-World Problem"** | Total communications blackout during natural disasters (e.g., Wayanad landslides, Himalayan floods) and tactical electronic warfare. | Resilient hybrid terrestrial-to-satellite failover restoring mission delivery from **29.6% back to 96.8% (+67.16 pp)**. |
 | **"Simulation to Physical Hardware"** | Validated in software-in-the-loop emulation over a live 3GPP 5G Core, with an immediate, low-cost deployment path on SDR & IoT edge hardware. | Transitioning from **Open5GS (17 daemons) + Linux `tc netem`** to **HackRF One / ADALM-PLUTO SDRs + Raspberry Pi 5**. |
 
 ---
@@ -84,7 +84,7 @@ RESCUE-NET guarantees that frontline sensor data, survivor vitals, and robotic t
 * **Hardware:** Software-Defined Radio (HackRF One / ADALM-PLUTO) interfacing with open-source 5G NTN waveforms (Open5GS / srsRAN).
 * **Function:**
   1. Uplinks critical rescue telemetry directly to orbiting LEO satellite relays (modeled after Starlink / OneWeb constellations).
-  2. **Closed-Loop Threat Response:** When physical obstacles or RF interference degrades the primary satellite link, the controller executes a sub-second route switch to an alternate satellite in **190 ms** with **0% route flapping** (enforced by a 5% hysteresis barrier).
+  2. **Closed-Loop Threat Response:** When physical obstacles or RF interference degrades the primary satellite link, the controller executes a sub-second route switch to an alternate satellite in **188 ms** with **25.7× reduced route flapping** (enforced by a 5% hysteresis barrier, cutting flaps to $0.71 \pm 0.82$).
   3. **Quantum-Safe Forward Secrecy:** Concurrently establishes a fresh encryption session using **NIST FIPS 203 ML-KEM-768** in **65 microseconds**, isolating the degraded link and protecting sensitive disaster/defense feeds from *"Harvest Now, Decrypt Later"* espionage.
 
 ---
@@ -95,12 +95,12 @@ Unlike hackathon concepts that only exist in slide decks, RESCUE-NET's core algo
 
 | Metric / Parameter | Conventional Static / Unmanaged Network | RESCUE-NET Autonomous Architecture | Measured Advantage / Impact |
 | :--- | :---: | :---: | :---: |
-| **Packet Delivery Under Interference / Jamming** | **$32.3\%$ PDR** ($67.7\%$ packet loss) | **$96.8\%$ PDR** ($3.2\%$ loss) | **$+64.5\%$ Net Mission Availability** ($p = 5.6 \times 10^{-15}$, $n=10$) |
-| **Autonomous Route Failover Latency** | Manual intervention ($>30\text{ s}$) | **$190\text{ ms}$** ($\text{SD} = 30\text{ ms}$) | **Sub-Second Path Healing** across satellite links |
-| **Route Flapping Oscillations** | Frequent flapping under jitter | **$0\text{ Flaps (0\%)}$** across 10 trials | **$5\%$ Hysteresis Barrier** ($\epsilon = 0.05$) guarantees stability |
+| **Packet Delivery Under Interference / Jamming** | **$29.6\%$ PDR** ($70.4\%$ packet loss) | **$96.8\%$ PDR** ($3.2\%$ loss) | **$+67.16\text{ pp}$ Net Mission Availability** ($95\%\text{ CI: } [66.82, 67.50]$, $n=100$) |
+| **Autonomous Route Failover Latency** | Manual intervention ($>30\text{ s}$) | **$188\text{ ms}$** (simulated transition model) | **Sub-Second Path Healing** across satellite links |
+| **Route Flapping Oscillations** | $18.26 \pm 3.48$ flaps under symmetric dither | **$0.71 \pm 0.82\text{ flaps}$** ($25.7\times$ reduction) | **$5\%$ Hysteresis Barrier** ($\epsilon = 0.05$) guarantees stability (0 flaps in 54% of trials) |
 | **Post-Quantum Cryptography Latency** | Classical RSA/ECC ($120\text{--}200\,\mu\text{s}$, quantum-vulnerable) | **$65\,\mu\text{s}$ ($0.065\text{ ms}$)** NIST ML-KEM-768 in C | **$3\times$ Faster than ECC**; sub-millisecond ($0.48\text{ ms}$) hybrid rekey |
 | **Telemetry Uplink Bandwidth Overhead** | $100\%$ Raw Byte Stream | Compressed moments via `zlib` | **$75\%$ Uplink Bandwidth Reduction** on constrained RF channels |
-| **Underlying Core Reliability** | Unverified mock scripts | **17 Active Open5GS Daemons** on Linux `ogstun` | **$53 / 53$ Automated Unit Tests Passing (100\%)** |
+| **Underlying Core Reliability** | Unverified mock scripts | **17 Active Open5GS Daemons** on Linux `ogstun` profile | **$53 / 53$ Automated Unit Tests Passing (100\%)** |
 
 ---
 

@@ -18,6 +18,8 @@ htmlcov/
 # Transient run logs
 *.log
 runs/events.jsonl
+runs/live_state.json
+runs/*.json
 
 # System files
 .DS_Store

@@ -90,25 +90,25 @@ Where $A_{\text{CUSUM}}(t)$ is derived from Page's test tracking satellite packe
 $$S_t = \max\left(0, S_{t-1} + \frac{\ell_t - \mu_t}{\sigma_t} - k\right)$$
 
 When $A_{\text{joint}}(t) \ge 0.60$:
-1. **Autonomous Route Handover:** Reroutes traffic to healthy LEO-2 in **190 ms ($\pm 30\text{ ms}$)**.
-2. **Hysteresis Enforcement:** Switching is locked under barrier $\epsilon = 0.05$, guaranteeing **0% route flapping**.
+1. **Autonomous Route Handover:** Reroutes traffic to healthy LEO-2 in **188 ms** (simulated discrete-event transition model based on 20 ms BFD sampling and BGP timeout parameters).
+2. **Hysteresis Enforcement:** Switching is locked under barrier $\epsilon = 0.05$, cutting route flaps from $18.26 \pm 3.48$ down to **$0.71 \pm 0.82$ flaps** ($25.7\times$ reduction, 0 flaps in $54\%$ of trials).
 3. **Quantum Forward Secrecy:** Concurrently triggers native C **NIST FIPS 203 ML-KEM-768** key encapsulation in **$65\text{ }\mu\text{s}$**, securing user data against eavesdropping.
 
 ---
 
 ## 4. Empirical Benchmark Data & System Outcomes
 
-Validated across 240 simulated O-RAN runs and 10 live Open5GS / `liboqs` hardware-in-the-loop trials:
+Validated across 100-seed Monte Carlo simulations, detection ablation studies, and testbed evaluations against 3GPP Rel-17 Open5GS core stack:
 
-| Metric / Parameter | Baseline (Uncoordinated) | Unified AICOP-RAKSHA System | Net Measurable Advantage |
+| Metric / Parameter | Baseline (Uncoordinated / Naive) | Unified AICOP-RAKSHA System | Net Measurable Advantage |
 | :--- | :---: | :---: | :---: |
-| **QoS-SLA Violation Under 50% Telemetry Flapping** | **35.31%** | **5.88%** | **-29.43% SLA Violations** (Superior to PACIFISTA baseline of 8.24%) |
-| **Daily Modeled Base Station Power Savings** | 0.0% (Always On) | **20.4% Daily (71.2% Off-Peak)** | Significant operational energy conservation |
-| **Packet Delivery Under Space Electronic Jamming** | **32.3% PDR** | **96.8% PDR** | **+64.5% Net PDR Gain** ($p = 5.6 \times 10^{-15}$) |
-| **Autonomous Route Failover Latency** | $>30\text{ seconds}$ (Manual) | **190 milliseconds** | **150× Faster Response**, sub-second path healing |
-| **Route Flapping Oscillations** | Frequent flapping | **0 Flaps (0%)** | Stable state enforced by $5\%$ hysteresis barrier |
+| **QoS-SLA Violation Under Telemetry Flapping** | **55.40%** (PACIFISTA: 22.15%) | **10.60%** (Matches Always-ON) | **-11.55 pp SLA Violations** over PACIFISTA ($p < 0.0001$) |
+| **Daily Modeled Base Station Power Savings** | 0.0% (Always On) | **20.4% Daily (71.2% Off-Peak)** | Significant operational energy conservation on honest cells |
+| **Packet Delivery Under Space Electronic Jamming** | **29.6% PDR** (Static) | **96.8% PDR** | **+67.16 pp Net PDR Gain** ($95\%\text{ CI: } [66.82, 67.50]$) |
+| **Autonomous Route Failover Latency (Simulated)** | $>30\text{ seconds}$ (Manual) | **188 milliseconds** (Simulated) | **Sub-second path healing** with calibrated transition model |
+| **Route Flapping Oscillations (Symmetric Dither)** | $18.26 \pm 3.48$ flaps | **$0.71 \pm 0.82$ flaps** | **25.7× Flap Reduction** (0 flaps in 54% of trials) |
 | **Post-Quantum Cryptographic Handshake** | None / Classical ECC | **NIST FIPS 203 ML-KEM-768** | **65 µs Encapsulation** in native C (`liboqs`) |
-| **Edge AI Inference Execution Overhead** | 400–1,200 ms (Cloud GPU) | **8.4 milliseconds** (pure NumPy) | Runs on embedded edge gNB without GPU dependency |
+| **Edge AI Inference Execution Overhead** | 400–1,200 ms (Cloud GPU) | **0.091 ms GNN / 0.385 ms Total** | Well within the $8.4\text{ ms}$ O-RAN Near-RT RIC deadline |
 
 ---
 
